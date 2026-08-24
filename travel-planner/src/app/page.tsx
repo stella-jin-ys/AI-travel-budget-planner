@@ -1,69 +1,52 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useState } from "react";
+import { TripSetup } from "@/features/trips/components/trip-setup";
+import { TripWorkspace } from "@/features/trips/components/trip-workspace";
+import type { TripBrief, TripPlan } from "@/features/trips/domain/trip";
+import { SyntheticTripProvider } from "@/features/trips/providers/synthetic-provider";
 
 export default function Home() {
+  const [plan, setPlan] = useState<TripPlan>();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string>();
+
+  async function buildPlan(brief: TripBrief) {
+    setError(undefined);
+
+    const supportedKnownTrip =
+      brief.mode !== "known-destination" ||
+      (brief.origin.toLocaleLowerCase() === "basel" &&
+        brief.destination?.toLocaleLowerCase() === "bernese oberland");
+
+    if (!supportedKnownTrip) {
+      setError(
+        "This synthetic demo supports only the Basel to Bernese Oberland family sample.",
+      );
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const result = await new SyntheticTripProvider().search(brief);
+      setPlan(result.plan);
+    } catch {
+      setError(
+        "The synthetic sample could not be opened. Check the brief and try again.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!plan) {
+    return <TripSetup onSubmit={buildPlan} busy={busy} error={error} />;
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="workspace-page">
+      <p className="synthetic-notice">Synthetic demonstration data</p>
+      <TripWorkspace initialPlan={plan} />
     </div>
   );
 }

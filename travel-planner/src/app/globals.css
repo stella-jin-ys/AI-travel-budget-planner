@@ -347,6 +347,302 @@ a {
   transform: translateY(1px);
 }
 
+.setup-shell {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3.5rem);
+  background: var(--paper-deep);
+}
+
+.trip-setup {
+  width: min(100%, 62rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.7fr);
+  gap: 1.5rem 2rem;
+  padding: clamp(1.25rem, 3.5vw, 3rem);
+  border: 1px solid var(--rule);
+  background: var(--paper-light);
+  box-shadow: 0.35rem 0.45rem 1.2rem rgb(111 106 95 / 0.2);
+}
+
+.trip-setup__header {
+  grid-column: 1 / -1;
+  max-width: 68ch;
+  display: grid;
+  gap: 0.55rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.trip-setup__header h1 {
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.trip-setup__header p,
+.workspace-leaf p {
+  max-width: 68ch;
+}
+
+.trip-setup__modes {
+  min-width: 0;
+  display: grid;
+  gap: 0.55rem;
+  padding: 0;
+  border: 0;
+}
+
+.trip-setup__modes legend {
+  margin-bottom: 0.65rem;
+  font-weight: 800;
+}
+
+.trip-setup__modes label {
+  min-height: 4.2rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  border: 1px solid var(--rule-soft);
+  background: var(--paper);
+  cursor: pointer;
+}
+
+.trip-setup__modes label:has(input:checked) {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.trip-setup__modes input {
+  margin-top: 0.18rem;
+  accent-color: var(--ink);
+}
+
+.trip-setup__modes span {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.trip-setup__modes small {
+  color: #454139;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.trip-setup__recommendation {
+  align-self: end;
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--teal);
+  background: rgb(22 139 136 / 0.08);
+}
+
+.trip-setup__recommendation h2 {
+  font-size: 1rem;
+}
+
+.trip-setup__recommendation p {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.trip-setup__recommendation dl {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.trip-setup__recommendation dt {
+  color: #454139;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.trip-setup__fields {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+}
+
+.trip-setup__fields label {
+  min-width: 0;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.trip-setup__fields input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  caret-color: var(--blue);
+  font: 1rem/1.2 var(--font-ui);
+}
+
+.trip-setup__fields input:hover {
+  border-color: var(--ink);
+}
+
+.trip-setup__fields input[aria-invalid="true"] {
+  border-color: var(--warning);
+}
+
+.trip-setup__field-error {
+  color: #7f2218;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+.trip-setup__controls {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding-top: 0.25rem;
+}
+
+.trip-setup__controls > p {
+  margin-right: auto;
+  font-family: var(--font-data);
+  font-size: 0.72rem;
+}
+
+.strict-budget {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.strict-budget input {
+  width: 2.4rem;
+  height: 1.35rem;
+  accent-color: var(--green);
+}
+
+.trip-setup__controls button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--yellow);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trip-setup__controls button:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.trip-setup__controls button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.trip-setup__controls button:disabled {
+  border-color: var(--rule-soft);
+  background: var(--paper-deep);
+  color: #5f5a50;
+  cursor: not-allowed;
+}
+
+.trip-setup__error {
+  grid-column: 1 / -1;
+  padding: 0.75rem;
+  border: 1px solid var(--warning);
+  background: rgb(185 54 38 / 0.08);
+  color: #7f2218;
+  font-weight: 800;
+}
+
+.workspace-page {
+  position: relative;
+}
+
+.synthetic-notice {
+  position: fixed;
+  right: 5.75rem;
+  bottom: 0.75rem;
+  z-index: 4;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--teal);
+  background: rgb(250 246 233 / 0.94);
+  box-shadow: 0.12rem 0.18rem 0.45rem rgb(111 106 95 / 0.2);
+  font-family: var(--font-data);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.workspace-chat {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1rem, 2.5vw, 2rem);
+}
+
+.workspace-chat h2 {
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+
+.workspace-chat dl {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.workspace-chat dl div {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.workspace-chat dt {
+  color: #454139;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workspace-chat dd {
+  font-family: var(--font-data);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.workspace-chat > p {
+  max-width: 32ch;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule-soft);
+  font-size: 0.8rem;
+}
+
+.workspace-leaf {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-leaf h1 {
+  max-width: 24ch;
+  font-size: clamp(1.7rem, 3.4vw, 3rem);
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
 @media (max-width: 900px) {
   .manual-shell {
     grid-template-columns: minmax(13rem, 18rem) minmax(0, 1fr) 4.5rem;
@@ -359,6 +655,43 @@ a {
 }
 
 @media (max-width: 719px) {
+  .setup-shell {
+    display: block;
+    padding: 0;
+  }
+
+  .trip-setup {
+    min-height: 100dvh;
+    grid-template-columns: 1fr;
+    padding: 1.25rem;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .trip-setup__header,
+  .trip-setup__fields,
+  .trip-setup__controls,
+  .trip-setup__error {
+    grid-column: 1;
+  }
+
+  .trip-setup__fields {
+    grid-template-columns: 1fr;
+  }
+
+  .trip-setup__controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .trip-setup__controls > p {
+    margin-right: 0;
+  }
+
+  .trip-setup__controls button {
+    width: 100%;
+  }
+
   .manual-shell {
     display: flex;
     flex-direction: column;
@@ -404,6 +737,11 @@ a {
 
   .section-tab[aria-selected="true"]::after {
     display: none;
+  }
+
+  .synthetic-notice {
+    right: 0.75rem;
+    bottom: 0.75rem;
   }
 }
 
