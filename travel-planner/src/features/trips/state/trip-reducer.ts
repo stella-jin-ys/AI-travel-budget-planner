@@ -77,6 +77,9 @@ export function tripReducer(
   }
 
   if (action.type === "replace-option") {
+    if (!state.plan.items.some((item) => item.id === action.itemId)) {
+      throw new Error(`Missing plan item for ${action.itemId}`);
+    }
     if (state.lockedItemIds.includes(action.itemId)) throw new LockedItemError();
 
     const plan = {

@@ -72,6 +72,19 @@ describe("tripReducer", () => {
     ).toThrow("Unlock this item before replacing it");
   });
 
+  it("rejects an unknown item before it creates history", () => {
+    const initial = createWorkspace(makePlanWithReplaceableStay());
+
+    expect(() =>
+      tripReducer(initial, {
+        type: "replace-option",
+        itemId: "unknown-item",
+        alternativeId: "stay-budget",
+      }),
+    ).toThrow("Missing plan item for unknown-item");
+    expect(initial.history).toEqual([]);
+  });
+
   it("undoes the last replacement", () => {
     const initial = createWorkspace(makePlanWithReplaceableStay());
     const changed = tripReducer(initial, {
