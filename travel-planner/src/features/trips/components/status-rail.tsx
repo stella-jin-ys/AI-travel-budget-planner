@@ -30,7 +30,8 @@ function formatMoney(value: Money): string {
       if (part.type === "fraction") return fraction;
       return part.value;
     })
-    .join("");
+    .join("")
+    .replaceAll("’", "'");
 }
 
 export function StatusRail({

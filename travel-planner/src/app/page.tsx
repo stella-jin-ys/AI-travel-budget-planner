@@ -45,7 +45,9 @@ export default function Home() {
 
   return (
     <div className="workspace-page">
+    <header aria-label="Synthetic data notice">
       <p className="synthetic-notice">Synthetic demonstration data</p>
+    </header>
       <TripWorkspace initialPlan={plan} />
     </div>
   );

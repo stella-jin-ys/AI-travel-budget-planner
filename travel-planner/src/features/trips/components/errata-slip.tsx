@@ -3,7 +3,7 @@ import { SourceBadge } from "./source-badge";
 
 export function ErrataSlip({ issue, now }: { issue: PlanIssue; now: Date }) {
   return (
-    <aside
+    <div
       className="errata-slip"
       role="alert"
       aria-label={`${issue.message} for ${issue.itemId}`}
@@ -34,7 +34,7 @@ export function ErrataSlip({ issue, now }: { issue: PlanIssue; now: Date }) {
           Check with supplier
         </a>
       ) : null}
-    </aside>
+    </div>
   );
 }
 
