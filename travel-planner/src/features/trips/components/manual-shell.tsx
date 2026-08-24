@@ -10,6 +10,7 @@ export function ManualShell(props: {
   state: TripWorkspaceState;
   chat: ReactNode;
   leaf: ReactNode;
+  mobileToday?: ReactNode;
   onSectionChange: (section: PlanSection) => void;
 }) {
   const checkedCount = props.state.plan.items.filter((item) =>
@@ -27,6 +28,9 @@ export function ManualShell(props: {
         readiness={props.state.readiness}
         checkedCount={checkedCount}
       />
+      {props.mobileToday ? (
+        <div className="mobile-today-slot">{props.mobileToday}</div>
+      ) : null}
       <aside className="chat-margin" aria-label="Trip conversation">
         {props.chat}
       </aside>

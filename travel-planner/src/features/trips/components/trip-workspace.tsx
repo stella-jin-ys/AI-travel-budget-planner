@@ -1,55 +1,53 @@
 "use client";
 
-import type { ReactNode } from "react";
-import type { PlanSection, TripPlan } from "../domain/trip";
+import type { Dispatch } from "react";
+import { demoNow } from "../domain/readiness";
+import type { TripPlan } from "../domain/trip";
+import type {
+  TripWorkspaceAction,
+  TripWorkspaceState,
+} from "../state/trip-reducer";
 import { useTripWorkspace } from "../state/use-trip-workspace";
+import { BudgetLeaf } from "./budget-leaf";
+import { ChecksLeaf } from "./checks-leaf";
+import { DaysLeaf } from "./days-leaf";
+import { FoodLeaf } from "./food-leaf";
 import { ManualShell } from "./manual-shell";
+import { MobileToday } from "./mobile-today";
+import { OverviewLeaf } from "./overview-leaf";
+import { StayLeaf } from "./stay-leaf";
+import { TravelLeaf } from "./travel-leaf";
 
-const sectionNotes: Record<Exclude<PlanSection, "overview">, string> = {
-  travel: "Review the sample rail and local transport choices.",
-  stay: "Review the sample family accommodation.",
-  days: "Review the deterministic daily outline.",
-  food: "Review the sample family meal allowance.",
-  budget: "Review costs for the group and each traveller.",
-  checks: "Review freshness and supplier-check reminders.",
-};
-
-function sectionLeaf(section: PlanSection, plan: TripPlan): ReactNode {
-  switch (section) {
+export function ActiveLeaf({
+  state,
+  dispatch,
+}: {
+  state: TripWorkspaceState;
+  dispatch: Dispatch<TripWorkspaceAction>;
+}) {
+  switch (state.activeSection) {
     case "overview":
-      return (
-        <div className="workspace-leaf">
-          <h1>{plan.title}</h1>
-          <p>
-            This open manual is a deterministic planning fixture. Use the tabs
-            to inspect its structure before any booking decision.
-          </p>
-        </div>
-      );
+      return <OverviewLeaf state={state} />;
     case "travel":
-      return <PlaceholderLeaf title="Travel" note={sectionNotes.travel} />;
+      return <TravelLeaf state={state} dispatch={dispatch} />;
     case "stay":
-      return <PlaceholderLeaf title="Stay" note={sectionNotes.stay} />;
+      return <StayLeaf state={state} dispatch={dispatch} />;
     case "days":
-      return <PlaceholderLeaf title="Days" note={sectionNotes.days} />;
+      return <DaysLeaf state={state} dispatch={dispatch} />;
     case "food":
-      return <PlaceholderLeaf title="Food" note={sectionNotes.food} />;
+      return <FoodLeaf state={state} dispatch={dispatch} />;
     case "budget":
-      return <PlaceholderLeaf title="Budget" note={sectionNotes.budget} />;
+      return (
+        <BudgetLeaf
+          budget={state.budget}
+          travelers={state.plan.brief.travelers}
+        />
+      );
     case "checks":
-      return <PlaceholderLeaf title="Checks" note={sectionNotes.checks} />;
+      return <ChecksLeaf plan={state.plan} readiness={state.readiness} />;
   }
 
-  section satisfies never;
-}
-
-function PlaceholderLeaf({ title, note }: { title: string; note: string }) {
-  return (
-    <div className="workspace-leaf">
-      <h1>{title}</h1>
-      <p>{note}</p>
-    </div>
-  );
+  state.activeSection satisfies never;
 }
 
 export function TripWorkspace({ initialPlan }: { initialPlan: TripPlan }) {
@@ -61,6 +59,7 @@ export function TripWorkspace({ initialPlan }: { initialPlan: TripPlan }) {
       onSectionChange={(section) =>
         dispatch({ type: "set-section", section })
       }
+      mobileToday={<MobileToday plan={state.plan} now={demoNow} />}
       chat={
         <div className="workspace-chat">
           <h2>Guided trip brief</h2>
@@ -83,7 +82,7 @@ export function TripWorkspace({ initialPlan }: { initialPlan: TripPlan }) {
           <p>No live search or booking availability is represented.</p>
         </div>
       }
-      leaf={sectionLeaf(state.activeSection, state.plan)}
+      leaf={<ActiveLeaf state={state} dispatch={dispatch} />}
     />
   );
 }

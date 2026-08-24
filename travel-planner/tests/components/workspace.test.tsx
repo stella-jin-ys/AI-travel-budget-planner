@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import Home from "@/app/page";
@@ -11,8 +11,9 @@ describe("TripWorkspace", () => {
   it("keeps total, readiness, and every manual tab visible", () => {
     render(<TripWorkspace initialPlan={buildSwitzerlandFamilyTrip()} />);
 
-    expect(screen.getByText("Group total")).toBeVisible();
-    expect(screen.getByText(/Review needed/i)).toBeVisible();
+    const status = within(screen.getByRole("banner", { name: "Trip status" }));
+    expect(status.getByText("Group total")).toBeVisible();
+    expect(status.getByText(/Review needed/i)).toBeVisible();
     for (const tab of [
       "Overview",
       "Travel",
