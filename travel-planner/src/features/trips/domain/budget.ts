@@ -38,8 +38,14 @@ export function calculateBudget(plan: TripPlan): BudgetSummary {
     if (!alternative) throw new Error(`Missing selected alternative for ${item.id}`);
     return alternative;
   });
-  const allCosts = selected.flatMap((option) => Object.values(option.travelerCosts));
-  if (allCosts.some((cost) => cost.currency !== plan.currency)) {
+  const allCosts = plan.items.flatMap((item) =>
+    item.alternatives.flatMap((option) => Object.values(option.travelerCosts)),
+  );
+  if (
+    allCosts.some((cost) => cost.currency !== plan.currency) ||
+    (plan.brief.strictBudget?.currency !== undefined &&
+      plan.brief.strictBudget.currency !== plan.currency)
+  ) {
     throw new Error("Plan contains mixed currencies");
   }
 
