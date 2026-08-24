@@ -1,7 +1,4 @@
 import argparse
-from pathlib import Path
-
-from commercepulse.config import ProjectPaths
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -22,4 +19,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

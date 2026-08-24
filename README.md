@@ -4,7 +4,8 @@ CommercePulse is a local-first ecommerce analytics scaffold.
 
 ## Commands
 
-- `python -m commercepulse.cli generate` to generate raw source data.
-- `python -m commercepulse.cli build` to build the warehouse and marts.
-- `python -m commercepulse.cli validate` to run data quality checks.
+These commands are scaffolded now and their pipeline behavior is wired in later tasks:
 
+- `python -m commercepulse.cli generate`
+- `python -m commercepulse.cli build`
+- `python -m commercepulse.cli validate`
