@@ -9,24 +9,40 @@ const readinessLabels: Record<ReadinessResult["state"], string> = {
 };
 
 function formatMoney(value: Money): string {
-  return new Intl.NumberFormat("en", {
+  const [integer, fraction] = value.amount.split(".");
+  const negative = integer.startsWith("-");
+  const absoluteInteger = negative ? integer.slice(1) : integer;
+  const groupedInteger = new Intl.NumberFormat("en-CH", {
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  }).format(BigInt(absoluteInteger));
+  const template = new Intl.NumberFormat("en-CH", {
     style: "currency",
     currency: value.currency,
-    minimumFractionDigits: 0,
+    currencyDisplay: "code",
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(Number(value.amount));
+  }).formatToParts(BigInt(negative ? -1 : 1));
+
+  return template
+    .map((part) => {
+      if (part.type === "integer") return groupedInteger;
+      if (part.type === "fraction") return fraction;
+      return part.value;
+    })
+    .join("");
 }
 
 export function StatusRail({
   budget,
   readiness,
+  checkedCount,
 }: {
   budget: BudgetSummary;
   readiness: ReadinessResult;
+  checkedCount: number;
 }) {
-  const warningCount = readiness.issues.filter(
-    (issue) => issue.severity === "warning",
-  ).length;
+  const warningCount = readiness.issues.length;
 
   return (
     <header className="status-rail" aria-label="Trip status">
@@ -44,7 +60,7 @@ export function StatusRail({
       </dl>
       <dl className="status-rail__metric">
         <dt>Checks</dt>
-        <dd>{readiness.issues.length}</dd>
+        <dd>{checkedCount}</dd>
       </dl>
       <dl className="status-rail__metric" data-warning={warningCount > 0}>
         <dt>Warnings</dt>

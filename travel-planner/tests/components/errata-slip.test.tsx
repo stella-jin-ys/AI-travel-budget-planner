@@ -46,4 +46,21 @@ describe("ErrataSlip", () => {
     expect(screen.getByText("Rail supplier")).toBeVisible();
     expect(screen.queryByRole("link", { name: "Check with supplier" })).not.toBeInTheDocument();
   });
+
+  it.each([
+    ["not-a-timestamp", "Check time unavailable"],
+    ["2026-08-24T10:00:00.001Z", "Check time is in the future"],
+    ["2026-08-24T10:00:00.000Z", "Checked today"],
+    ["2026-08-23T10:00:00.000Z", "Checked 1 day ago"],
+    ["2026-08-20T10:00:00.000Z", "Checked 4 days ago"],
+  ])("reports checked time %s truthfully", (checkedAt, expected) => {
+    render(
+      <ErrataSlip
+        issue={{ ...staleTransportIssue, checkedAt }}
+        now={new Date("2026-08-24T10:00:00.000Z")}
+      />,
+    );
+
+    expect(screen.getByText(expected)).toBeVisible();
+  });
 });

@@ -3,7 +3,7 @@
 import type { KeyboardEvent } from "react";
 import type { PlanSection } from "../domain/trip";
 
-const sections: Array<{ id: PlanSection; label: string }> = [
+export const sections: Array<{ id: PlanSection; label: string }> = [
   { id: "overview", label: "Overview" },
   { id: "travel", label: "Travel" },
   { id: "stay", label: "Stay" },
@@ -49,7 +49,6 @@ export function SectionTabs(props: {
       className="section-tabs"
       role="tablist"
       aria-label="Trip sections"
-      aria-orientation="vertical"
     >
       {sections.map((section, index) => (
         <button

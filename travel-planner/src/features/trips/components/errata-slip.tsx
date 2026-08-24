@@ -21,7 +21,7 @@ export function ErrataSlip({ issue, now }: { issue: PlanIssue; now: Date }) {
         </div>
         <div>
           <dt>Last checked</dt>
-          <dd>Checked {formatRelativeTime(issue.checkedAt, now)}</dd>
+          <dd>{formatRelativeTime(issue.checkedAt, now)}</dd>
         </div>
       </dl>
       {issue.sourceUrl ? (
@@ -39,11 +39,19 @@ export function ErrataSlip({ issue, now }: { issue: PlanIssue; now: Date }) {
 }
 
 function formatRelativeTime(checkedAt: string, now: Date): string {
-  const days = Math.max(
-    0,
-    Math.floor(
-      (now.getTime() - new Date(checkedAt).getTime()) / (24 * 60 * 60 * 1000),
-    ),
+  const checkedTime = new Date(checkedAt).getTime();
+  const nowTime = now.getTime();
+  if (!Number.isFinite(checkedTime) || !Number.isFinite(nowTime)) {
+    return "Check time unavailable";
+  }
+  if (checkedTime > nowTime) {
+    return "Check time is in the future";
+  }
+
+  const days = Math.floor(
+    (nowTime - checkedTime) / (24 * 60 * 60 * 1000),
   );
-  return days === 0 ? "today" : `${days} day${days === 1 ? "" : "s"} ago`;
+  return days === 0
+    ? "Checked today"
+    : `Checked ${days} day${days === 1 ? "" : "s"} ago`;
 }
