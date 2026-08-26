@@ -1901,3 +1901,9 @@ body, .setup-shell, .active-leaf { background: #f7f4ea; color: #16233b; }
   .active-leaf { order:3; padding:1rem; }
   .section-tabs { order:1; }
 }
+
+/* Audit fixes: keep compact Prism labels readable against the approved palette. */
+.workspace-leaf p, .leaf-intro, .trip-setup__header p, .trip-setup__modes small { color:#3f536d; }
+.trip-setup__fields input::placeholder { color:#52637a; }
+.chat-edit { min-height:2rem; padding:.35rem .5rem; border:1px solid #2f55d4; background:transparent; color:#2f55d4; cursor:pointer; }
+.chat-edit:focus-visible { outline:3px solid #ff6347; outline-offset:2px; }

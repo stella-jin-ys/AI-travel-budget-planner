@@ -50,7 +50,7 @@ export function ActiveLeaf({
   state.activeSection satisfies never;
 }
 
-export function TripWorkspace({ initialPlan }: { initialPlan: TripPlan }) {
+export function TripWorkspace({ initialPlan, onEditBrief }: { initialPlan: TripPlan; onEditBrief?: () => void }) {
   const { state, dispatch } = useTripWorkspace(initialPlan);
 
   return (
@@ -82,7 +82,7 @@ export function TripWorkspace({ initialPlan }: { initialPlan: TripPlan }) {
             </div>
           </dl>
           <p>No live search or booking availability is represented.</p>
-          <button type="button" className="chat-edit">EDIT BRIEF ↗</button>
+          <button type="button" className="chat-edit" onClick={onEditBrief}>EDIT BRIEF ↗</button>
         </div>
       }
       leaf={<ActiveLeaf state={state} dispatch={dispatch} />}

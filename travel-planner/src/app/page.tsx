@@ -53,7 +53,7 @@ export default function Home() {
     <header aria-label="Synthetic data notice">
       <p className="synthetic-notice">Synthetic demonstration data</p>
     </header>
-      <TripWorkspace initialPlan={plan} />
+      <TripWorkspace initialPlan={plan} onEditBrief={() => setPlan(undefined)} />
     </div>
   );
 }

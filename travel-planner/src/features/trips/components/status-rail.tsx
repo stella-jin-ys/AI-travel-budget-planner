@@ -57,7 +57,7 @@ export function StatusRail({
       </dl>
       <dl className="status-rail__metric">
         <dt>Trip</dt>
-        <dd>{plan.brief.endDate ? `${plan.brief.travelers.length} travelers / ${plan.days.length} days` : "Trip"}</dd>
+      <dd>{plan.brief.endDate ? `${plan.days.length} nights / ${plan.brief.travelers.length} travellers` : "Trip"}</dd>
       </dl>
       <dl className="status-rail__metric" data-warning={warningCount > 0}>
         <dt>Readiness</dt>
