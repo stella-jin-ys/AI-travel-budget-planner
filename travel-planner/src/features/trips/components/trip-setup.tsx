@@ -71,10 +71,10 @@ export function TripSetup({
     <main className="setup-shell" aria-labelledby="setup-title">
       <form className="trip-setup" onSubmit={submit}>
         <header className="trip-setup__header">
-          <h1 id="setup-title">Build the family trip manual</h1>
+          <h1 id="setup-title">Build your trip manual</h1>
           <p>
-            Set the brief, then open a deterministic Switzerland sample you
-            can inspect section by section.
+            Tell us where you’re going, then inspect an explainable plan and
+            budget section by section.
           </p>
         </header>
 
@@ -90,7 +90,7 @@ export function TripSetup({
             />
             <span>
               <strong>I know where</strong>
-              <small>Use the supported Basel to Bernese Oberland sample.</small>
+              <small>Enter a destination and shape the trip yourself.</small>
             </span>
           </label>
           <label>

@@ -4,32 +4,15 @@ import { useState } from "react";
 import { TripSetup } from "@/features/trips/components/trip-setup";
 import { TripWorkspace } from "@/features/trips/components/trip-workspace";
 import type { TripBrief, TripPlan } from "@/features/trips/domain/trip";
-import { buildSwitzerlandFamilyTrip } from "@/features/trips/fixtures/switzerland-family";
 import { SyntheticTripProvider } from "@/features/trips/providers/synthetic-provider";
 
 export default function Home() {
-  const [plan, setPlan] = useState<TripPlan | undefined>(() =>
-    process.env.NODE_ENV === "production"
-      ? buildSwitzerlandFamilyTrip()
-      : undefined,
-  );
+  const [plan, setPlan] = useState<TripPlan | undefined>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
 
   async function buildPlan(brief: TripBrief) {
     setError(undefined);
-
-    const supportedKnownTrip =
-      brief.mode !== "known-destination" ||
-      (brief.origin.toLocaleLowerCase() === "basel" &&
-        brief.destination?.toLocaleLowerCase() === "bernese oberland");
-
-    if (!supportedKnownTrip) {
-      setError(
-        "This synthetic demo supports only the Basel to Bernese Oberland family sample.",
-      );
-      return;
-    }
 
     setBusy(true);
     try {

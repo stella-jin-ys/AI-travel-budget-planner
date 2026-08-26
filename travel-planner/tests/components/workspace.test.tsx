@@ -60,7 +60,7 @@ describe("trip route", () => {
     expect(screen.getByText("Synthetic demonstration data")).toBeVisible();
   });
 
-  it("opens the same supported fixture from inspire-me mode", async () => {
+  it("uses the submitted origin when opening an inspire-me plan", async () => {
     const user = userEvent.setup();
     render(<Home />);
 
@@ -68,15 +68,11 @@ describe("trip route", () => {
     await user.type(screen.getByRole("textbox", { name: "Origin" }), "Basel");
     await user.click(screen.getByRole("button", { name: "Build sample plan" }));
 
-    expect(
-      await screen.findByRole("heading", {
-        name: "Synthetic Switzerland family trip: Basel to Bernese Oberland",
-      }),
-    ).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Recommended travel plan" })).toBeVisible();
     expect(screen.getByText("Synthetic demonstration data")).toBeVisible();
   });
 
-  it("keeps unsupported known destinations at the honest synthetic boundary", async () => {
+  it("accepts a user-entered known destination", async () => {
     const user = userEvent.setup();
     render(<Home />);
 
@@ -84,9 +80,6 @@ describe("trip route", () => {
     await user.type(screen.getByRole("textbox", { name: "Destination" }), "Paris");
     await user.click(screen.getByRole("button", { name: "Build sample plan" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "This synthetic demo supports only the Basel to Bernese Oberland family sample.",
-    );
-    expect(screen.queryByRole("main", { name: "Trip planning workspace" })).not.toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Stockholm to Paris travel plan" })).toBeVisible();
   });
 });
