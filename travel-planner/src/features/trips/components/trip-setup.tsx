@@ -21,7 +21,10 @@ export function TripSetup({
   const [startDate, setStartDate] = useState("2026-09-10");
   const [endDate, setEndDate] = useState("2026-09-13");
   const [childAge, setChildAge] = useState(10);
+  const [travelerCount, setTravelerCount] = useState(2);
   const [interests, setInterests] = useState("mountains, family rail");
+  const [purpose, setPurpose] = useState("");
+  const [accommodationType, setAccommodationType] = useState<NonNullable<TripBrief["accommodationType"]>>("hotel");
   const [budget, setBudget] = useState("1200.00");
   const [strict, setStrict] = useState(true);
 
@@ -30,6 +33,7 @@ export function TripSetup({
   const ready =
     Boolean(origin.trim() && startDate && endDate) &&
     (mode === "inspire-me" || Boolean(destination.trim())) &&
+    travelerCount >= 1 &&
     strictBudgetValid;
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -44,24 +48,17 @@ export function TripSetup({
         mode === "known-destination" ? destination.trim() : undefined,
       startDate,
       endDate,
-      travelers: [
-        {
-          id: "adult-1",
-          name: "Adult",
-          age: 35,
-          eligibility: ["adult", "family"],
-        },
-        {
-          id: "child-1",
-          name: "Child",
-          age: childAge,
-          eligibility: ["child", "family"],
-        },
-      ],
+      travelers: Array.from({ length: travelerCount }, (_, index) =>
+        index === 1
+          ? { id: "child-1", name: "Child", age: childAge, eligibility: ["child", "family"] }
+          : { id: `adult-${index + 1}`, name: index === 0 ? "Adult" : `Traveller ${index + 1}`, age: 35, eligibility: ["adult"] },
+      ),
       interests: interests
         .split(",")
         .map((value) => value.trim())
         .filter(Boolean),
+      purpose: purpose.trim() || undefined,
+      accommodationType,
       strictBudget:
         strict && budget.trim() ? money(budget.trim(), "CHF") : undefined,
     });
@@ -162,6 +159,18 @@ export function TripSetup({
             />
           </label>
           <label>
+            <span>Number of travellers</span>
+            <input
+              type="number"
+              min="1"
+              max="12"
+              value={travelerCount}
+              aria-label="Number of travellers"
+              onChange={(event) => setTravelerCount(Number(event.target.value))}
+              required
+            />
+          </label>
+          <label>
             <span>Child age</span>
             <input
               type="number"
@@ -170,6 +179,25 @@ export function TripSetup({
               value={childAge}
               onChange={(event) => setChildAge(Number(event.target.value))}
             />
+          </label>
+          <label>
+            <span>Purpose or activities</span>
+            <input
+              value={purpose}
+              aria-label="Purpose or activities"
+              onChange={(event) => setPurpose(event.target.value)}
+              placeholder="e.g. summer hiking, ski weekend"
+            />
+          </label>
+          <label>
+            <span>Accommodation type</span>
+            <select aria-label="Accommodation type" value={accommodationType} onChange={(event) => setAccommodationType(event.target.value as NonNullable<TripBrief["accommodationType"]>)}>
+              <option value="hotel">Hotel</option>
+              <option value="hostel">Hostel</option>
+              <option value="apartment">Apartment</option>
+              <option value="camping">Camping</option>
+              <option value="guesthouse">Guesthouse</option>
+            </select>
           </label>
           <label>
             <span>Interests</span>
@@ -208,7 +236,7 @@ export function TripSetup({
             Strict budget
           </label>
           <button type="submit" disabled={!ready || busy}>
-            {busy ? "Building sample plan…" : "Build sample plan"}
+            {busy ? "Building travel plan…" : "Build my travel plan"}
           </button>
         </div>
 

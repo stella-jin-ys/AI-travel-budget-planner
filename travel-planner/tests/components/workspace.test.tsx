@@ -51,7 +51,7 @@ describe("trip route", () => {
       screen.getByRole("textbox", { name: "Destination" }),
       "Bernese Oberland",
     );
-    await user.click(screen.getByRole("button", { name: "Build sample plan" }));
+    await user.click(screen.getByRole("button", { name: "Build my travel plan" }));
 
     expect(await screen.findByRole("main", { name: "Trip planning workspace" })).toBeVisible();
     expect(screen.getByText("Synthetic demonstration data")).toBeVisible();
@@ -66,7 +66,7 @@ describe("trip route", () => {
 
     await user.click(screen.getByRole("radio", { name: "Inspire me" }));
     await user.type(screen.getByRole("textbox", { name: "Origin" }), "Basel");
-    await user.click(screen.getByRole("button", { name: "Build sample plan" }));
+    await user.click(screen.getByRole("button", { name: "Build my travel plan" }));
 
     expect(await screen.findByRole("heading", { name: "Recommended travel plan" })).toBeVisible();
     expect(screen.getByText("Synthetic demonstration data")).toBeVisible();
@@ -78,7 +78,7 @@ describe("trip route", () => {
 
     await user.type(screen.getByRole("textbox", { name: "Origin" }), "Stockholm");
     await user.type(screen.getByRole("textbox", { name: "Destination" }), "Paris");
-    await user.click(screen.getByRole("button", { name: "Build sample plan" }));
+    await user.click(screen.getByRole("button", { name: "Build my travel plan" }));
 
     expect(await screen.findByRole("heading", { name: "Stockholm to Paris travel plan" })).toBeVisible();
   });

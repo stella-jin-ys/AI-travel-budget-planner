@@ -12,16 +12,16 @@ describe("TripSetup", () => {
 
     expect(screen.getByRole("radio", { name: "I know where" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Inspire me" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Build sample plan" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Build my travel plan" })).toBeDisabled();
 
     await user.type(screen.getByRole("textbox", { name: "Origin" }), "Basel");
-    expect(screen.getByRole("button", { name: "Build sample plan" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Build my travel plan" })).toBeDisabled();
 
     await user.type(
       screen.getByRole("textbox", { name: "Destination" }),
       "Bernese Oberland",
     );
-    expect(screen.getByRole("button", { name: "Build sample plan" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Build my travel plan" })).toBeEnabled();
   });
 
   it("submits every known-destination field as a complete trip brief", async () => {
@@ -41,7 +41,11 @@ describe("TripSetup", () => {
     );
     await user.clear(screen.getByRole("textbox", { name: "Budget in CHF" }));
     await user.type(screen.getByRole("textbox", { name: "Budget in CHF" }), "1350.00");
-    await user.click(screen.getByRole("button", { name: "Build sample plan" }));
+    await user.clear(screen.getByRole("spinbutton", { name: "Number of travellers" }));
+    await user.type(screen.getByRole("spinbutton", { name: "Number of travellers" }), "3");
+    await user.type(screen.getByRole("textbox", { name: "Purpose or activities" }), "mountain walks");
+    await user.selectOptions(screen.getByRole("combobox", { name: "Accommodation type" }), "hostel");
+    await user.click(screen.getByRole("button", { name: "Build my travel plan" }));
 
     expect(onSubmit).toHaveBeenCalledWith({
       mode: "known-destination",
@@ -54,7 +58,7 @@ describe("TripSetup", () => {
           id: "adult-1",
           name: "Adult",
           age: 35,
-          eligibility: ["adult", "family"],
+          eligibility: ["adult"],
         },
         {
           id: "child-1",
@@ -62,8 +66,16 @@ describe("TripSetup", () => {
           age: 10,
           eligibility: ["child", "family"],
         },
+        {
+          id: "adult-3",
+          name: "Traveller 3",
+          age: 35,
+          eligibility: ["adult"],
+        },
       ],
       interests: ["mountains", "family rail"],
+      purpose: "mountain walks",
+      accommodationType: "hostel",
       strictBudget: { amount: "1350.00", currency: "CHF" },
       fixtureId: "switzerland-family",
     });
@@ -81,7 +93,7 @@ describe("TripSetup", () => {
     await user.clear(screen.getByRole("textbox", { name: "Budget in CHF" }));
 
     expect(screen.getByText("Enter a valid CHF budget or turn off Strict budget.")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Build sample plan" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Build my travel plan" })).toBeDisabled();
   });
 
   it("describes inspire-me as a synthetic recommendation with its exact reason", async () => {
@@ -95,10 +107,10 @@ describe("TripSetup", () => {
     expect(screen.getByText("Synthetic recommendation")).toBeVisible();
     expect(screen.getByText("family rail travel and mountain activities")).toBeVisible();
     expect(screen.getByText("Guided demo — no live AI call")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Build sample plan" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Build my travel plan" })).toBeDisabled();
 
     await user.type(screen.getByRole("textbox", { name: "Origin" }), "Basel");
-    await user.click(screen.getByRole("button", { name: "Build sample plan" }));
+    await user.click(screen.getByRole("button", { name: "Build my travel plan" }));
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({

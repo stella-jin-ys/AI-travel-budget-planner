@@ -52,6 +52,8 @@ export interface TripBrief {
   endDate: string;
   travelers: Traveler[];
   interests: string[];
+  purpose?: string;
+  accommodationType?: "hotel" | "hostel" | "apartment" | "camping" | "guesthouse";
   strictBudget?: Money;
   fixtureId?: "switzerland-family";
 }

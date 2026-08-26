@@ -80,6 +80,14 @@ export function TripWorkspace({ initialPlan, onEditBrief }: { initialPlan: TripP
                 {state.plan.brief.startDate} to {state.plan.brief.endDate}
               </dd>
             </div>
+            <div>
+              <dt>Purpose</dt>
+              <dd>{state.plan.brief.purpose ?? state.plan.brief.interests.join(", ")}</dd>
+            </div>
+            <div>
+              <dt>Stay</dt>
+              <dd>{state.plan.brief.accommodationType ?? "Flexible"}</dd>
+            </div>
           </dl>
           <p>No live search or booking availability is represented.</p>
           <button type="button" className="chat-edit" onClick={onEditBrief}>EDIT BRIEF ↗</button>
