@@ -1893,6 +1893,10 @@ body, .setup-shell, .active-leaf { background: #f7f4ea; color: #16233b; }
 .prism-alert strong, .prism-alert p, .prism-alert button { font-size:.55rem; }
 .section-tab { font-size:.58rem; }
 .section-tab small { font-size:.5rem; }
+/* Accessible active states: use the same light callout colors as the ledger values. */
+.section-tab:hover,
+.section-tab:focus-visible { background:#ffd9b8; color:#16233b; }
+.section-tab[aria-selected="true"] { background:#d4f2e8; color:#16233b; box-shadow:inset 0 0 0 2px #16233b; }
 @media (max-width:719px) {
   .manual-shell { display:flex; flex-direction:column; }
   .prism-top { height:2.55rem; }
