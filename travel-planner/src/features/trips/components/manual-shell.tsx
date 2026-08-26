@@ -13,20 +13,17 @@ export function ManualShell(props: {
   mobileToday?: ReactNode;
   onSectionChange: (section: PlanSection) => void;
 }) {
-  const checkedCount = props.state.plan.items.filter((item) =>
-    item.alternatives.find(
-      (alternative) =>
-        alternative.id === item.selectedAlternativeId &&
-        Boolean(alternative.evidence.checkedAt),
-    ),
-  ).length;
-
   return (
     <main className="manual-shell" aria-label="Trip planning workspace">
+      <header className="prism-top" aria-label="Planner identity">
+        <div className="prism-brand"><b aria-hidden="true">✦</b><strong>AI TRAVEL BUDGET PLANNER</strong></div>
+        <span>EUROPE / {props.state.plan.currency}</span>
+        <span className="demo-tag"><i aria-hidden="true" /> SYNTHETIC DEMO</span>
+      </header>
       <StatusRail
         budget={props.state.budget}
         readiness={props.state.readiness}
-        checkedCount={checkedCount}
+        plan={props.state.plan}
       />
       {props.mobileToday ? (
         <div className="mobile-today-slot">{props.mobileToday}</div>

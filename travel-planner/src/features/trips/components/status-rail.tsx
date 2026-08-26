@@ -1,6 +1,6 @@
 import type { BudgetSummary } from "../domain/budget";
 import type { ReadinessResult } from "../domain/readiness";
-import type { Money } from "../domain/trip";
+import type { Money, TripPlan } from "../domain/trip";
 
 const readinessLabels: Record<ReadinessResult["state"], string> = {
   draft: "Draft",
@@ -37,11 +37,11 @@ function formatMoney(value: Money): string {
 export function StatusRail({
   budget,
   readiness,
-  checkedCount,
+  plan,
 }: {
   budget: BudgetSummary;
   readiness: ReadinessResult;
-  checkedCount: number;
+  plan: TripPlan;
 }) {
   const warningCount = readiness.issues.length;
 
@@ -56,14 +56,18 @@ export function StatusRail({
         <dd>{formatMoney(budget.perPerson)}</dd>
       </dl>
       <dl className="status-rail__metric">
+        <dt>Trip</dt>
+        <dd>{plan.brief.endDate ? `${plan.brief.travelers.length} travelers / ${plan.days.length} days` : "Trip"}</dd>
+      </dl>
+      <dl className="status-rail__metric" data-warning={warningCount > 0}>
         <dt>Readiness</dt>
         <dd>{readinessLabels[readiness.state]}</dd>
       </dl>
-      <dl className="status-rail__metric">
+      <dl className="status-rail__metric status-rail__metric--compact">
         <dt>Checks</dt>
-        <dd>{checkedCount}</dd>
+        <dd>{plan.items.filter((item) => item.alternatives.some((alternative) => alternative.id === item.selectedAlternativeId && Boolean(alternative.evidence.checkedAt))).length}</dd>
       </dl>
-      <dl className="status-rail__metric" data-warning={warningCount > 0}>
+      <dl className="status-rail__metric status-rail__metric--compact">
         <dt>Warnings</dt>
         <dd>{warningCount}</dd>
       </dl>

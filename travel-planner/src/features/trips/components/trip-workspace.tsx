@@ -62,7 +62,9 @@ export function TripWorkspace({ initialPlan }: { initialPlan: TripPlan }) {
       mobileToday={<MobileToday plan={state.plan} now={demoNow} />}
       chat={
         <div className="workspace-chat">
-          <h2>Guided trip brief</h2>
+          <small className="eyebrow">TRIP BRIEF</small>
+          <h2>{state.plan.brief.origin} to<br /><em>{state.plan.brief.destination ?? "your destination"}</em></h2>
+          <p className="chat-summary">A feasible plan with practical transfers, stay options, and a visible budget ceiling.</p>
           <dl>
             <div>
               <dt>Origin</dt>
@@ -80,6 +82,7 @@ export function TripWorkspace({ initialPlan }: { initialPlan: TripPlan }) {
             </div>
           </dl>
           <p>No live search or booking availability is represented.</p>
+          <button type="button" className="chat-edit">EDIT BRIEF ↗</button>
         </div>
       }
       leaf={<ActiveLeaf state={state} dispatch={dispatch} />}
