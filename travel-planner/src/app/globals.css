@@ -1823,3 +1823,34 @@ body, .setup-shell, .active-leaf { background: var(--paper); color: var(--ink); 
 .synthetic-notice { border-color: var(--green); background: rgb(23 34 30 / 0.95); color: #b9edc8; }
 .workspace-leaf h1, .workspace-leaf h2 { color: var(--ink); }
 .workspace-leaf p, .leaf-intro, .trip-setup__header p, .trip-setup__modes small { color: #aebdb2; }
+
+/* Final Prism Ledger cascade: this intentionally follows the legacy Precision Ledger block. */
+html { color-scheme: light; background: #f7f4ea; }
+body, .setup-shell, .active-leaf { background: #f7f4ea; color: #16233b; }
+.setup-shell { background: #ffca3a; }
+.trip-setup { background: #fffdf7; border-color: #16233b; box-shadow: .35rem .45rem 1.2rem rgb(22 35 59 / .16); }
+.trip-setup__header { border-bottom-color: #9aa8b6; }
+.trip-setup__header h1 { color: #16233b; }
+.trip-setup__header p, .trip-setup__modes small, .trip-setup__controls > p { color: #4b5f79; }
+.trip-setup__modes label { background: #f7f4ea; border-color: #c4cbc7; color: #16233b; }
+.trip-setup__modes label:hover { background: #eaf0ff; }
+.trip-setup__modes label:has(input:checked) { border-color: #2f55d4; box-shadow: inset 0 0 0 1px #2f55d4; background: #dce8ff; }
+.trip-setup__fields input { background: #fffdf7; border-color: #9aa8b6; color: #16233b; }
+.trip-setup__fields input::placeholder { color: #68778b; }
+.trip-setup__recommendation { border-color: #35a47b; background: #e6f5ef; }
+.trip-setup__controls { border-top-color: #9aa8b6; }
+.trip-setup__controls button { border-color: #2f55d4; background: #2f55d4; color: #fffdf7; }
+.trip-setup__controls button:hover:not(:disabled) { background: #2445b4; }
+.status-rail { background: #2f55d4; border-color: #16233b; color: #fffdf7; }
+.status-rail__metric { border-color: rgb(255 255 255 / .3); }
+.status-rail dt { color: #fffdf7; }
+.status-rail__metric:first-child dd { color: #b8a7ff; }
+.chat-margin { background: #ffca3a; border-color: #16233b; }
+.section-tabs { background: #16233b; border-color: #16233b; }
+.section-tab, .section-tab:nth-child(2), .section-tab:nth-child(3), .section-tab:nth-child(4), .section-tab:nth-child(5), .section-tab:nth-child(6), .section-tab:nth-child(7) { --tab-color: #203252; color: #c7d1e0; border-bottom-color: #425575; }
+.section-tab[aria-selected="true"] { background: #b8a7ff; color: #16233b; box-shadow: inset 0 0 0 2px #16233b; }
+.workspace-leaf h1, .workspace-leaf h2 { color: #16233b; }
+.workspace-leaf p, .leaf-intro, .trip-setup__header p, .trip-setup__modes small { color: #4b5f79; }
+.option-row, .errata-slip, .budget-summary, .check-group, .fact-list { border-color: #c4cbc7; background: #fffdf7; }
+.option-row__cost, .option-row__delta, .budget-summary dd, .fact-list dd { color: #2f55d4; }
+.synthetic-notice { border-color: #ff8b70; background: #fff0e9; color: #c63d29; }
