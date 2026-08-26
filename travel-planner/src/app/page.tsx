@@ -4,10 +4,15 @@ import { useState } from "react";
 import { TripSetup } from "@/features/trips/components/trip-setup";
 import { TripWorkspace } from "@/features/trips/components/trip-workspace";
 import type { TripBrief, TripPlan } from "@/features/trips/domain/trip";
+import { buildSwitzerlandFamilyTrip } from "@/features/trips/fixtures/switzerland-family";
 import { SyntheticTripProvider } from "@/features/trips/providers/synthetic-provider";
 
 export default function Home() {
-  const [plan, setPlan] = useState<TripPlan>();
+  const [plan, setPlan] = useState<TripPlan | undefined>(() =>
+    process.env.NODE_ENV === "production"
+      ? buildSwitzerlandFamilyTrip()
+      : undefined,
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
 
