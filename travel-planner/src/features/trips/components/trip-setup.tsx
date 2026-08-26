@@ -36,6 +36,14 @@ export function TripSetup({
     travelerCount >= 1 &&
     strictBudgetValid;
 
+  const purposePresets = ["Summer escape", "Ski weekend", "City culture", "Slow & scenic"];
+  const accommodationPresets: Array<{ value: NonNullable<TripBrief["accommodationType"]>; label: string }> = [
+    { value: "hotel", label: "Hotel" },
+    { value: "hostel", label: "Hostel" },
+    { value: "apartment", label: "Apartment" },
+    { value: "camping", label: "Camping" },
+  ];
+
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!ready || busy) return;
@@ -160,15 +168,11 @@ export function TripSetup({
           </label>
           <label>
             <span>Number of travellers</span>
-            <input
-              type="number"
-              min="1"
-              max="12"
-              value={travelerCount}
-              aria-label="Number of travellers"
-              onChange={(event) => setTravelerCount(Number(event.target.value))}
-              required
-            />
+            <div className="traveller-stepper">
+              <button type="button" aria-label="Decrease travellers" onClick={() => setTravelerCount(Math.max(1, travelerCount - 1))}>−</button>
+              <input type="number" min="1" max="12" value={travelerCount} aria-label="Number of travellers" onChange={(event) => setTravelerCount(Number(event.target.value))} required />
+              <button type="button" aria-label="Increase travellers" onClick={() => setTravelerCount(Math.min(12, travelerCount + 1))}>+</button>
+            </div>
           </label>
           <label>
             <span>Child age</span>
@@ -188,6 +192,9 @@ export function TripSetup({
               onChange={(event) => setPurpose(event.target.value)}
               placeholder="e.g. summer hiking, ski weekend"
             />
+            <div className="choice-chips" aria-label="Purpose presets">
+              {purposePresets.map((preset) => <button type="button" key={preset} onClick={() => setPurpose(preset)} className={purpose === preset ? "is-active" : ""}>{preset}</button>)}
+            </div>
           </label>
           <label>
             <span>Accommodation type</span>
@@ -198,6 +205,9 @@ export function TripSetup({
               <option value="camping">Camping</option>
               <option value="guesthouse">Guesthouse</option>
             </select>
+            <div className="choice-chips" aria-label="Accommodation presets">
+              {accommodationPresets.map((preset) => <button type="button" key={preset.value} onClick={() => setAccommodationType(preset.value)} className={accommodationType === preset.value ? "is-active" : ""}>{preset.label}</button>)}
+            </div>
           </label>
           <label>
             <span>Interests</span>
@@ -223,6 +233,12 @@ export function TripSetup({
             ) : null}
           </label>
         </div>
+
+        <output className="brief-preview" aria-live="polite">
+          <span>YOUR BRIEF</span>
+          <strong>{travelerCount || 0} traveller{travelerCount === 1 ? "" : "s"} · {accommodationType} · {purpose || "add a purpose"}</strong>
+          <small>We’ll use this to shape transport, stay, activities, and food suggestions.</small>
+        </output>
 
         <div className="trip-setup__controls">
           <p>Guided demo — no live AI call</p>
