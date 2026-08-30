@@ -8,12 +8,41 @@ import { buildSwitzerlandFamilyTrip } from "@/features/trips/fixtures/switzerlan
 afterEach(cleanup);
 
 describe("TripWorkspace", () => {
+  it("expands each overview card in place without a separate itinerary region", async () => {
+    const user = userEvent.setup();
+    render(<TripWorkspace initialPlan={buildSwitzerlandFamilyTrip()} />);
+
+    const details = [
+      ["Overview", "Review the ledger below"],
+      ["Transportation", "Supplier source:"],
+      ["Stay", "Supplier source:"],
+      ["Food", "Supplier source:"],
+      ["Activities", "Supplier source:"],
+      ["Local transport", "Supplier source:"],
+      ["Itinerary", "2026-09-10"],
+    ] as const;
+
+    for (const [label, detail] of details) {
+      const trigger = screen.getByRole("button", { name: label });
+      const card = trigger.closest("article");
+      expect(card).not.toBeNull();
+      expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+      await user.click(trigger);
+
+      expect(trigger).toHaveAttribute("aria-expanded", "true");
+      expect(within(card!).getByText(detail, { exact: false })).toBeVisible();
+    }
+
+    expect(screen.queryByRole("region", { name: "Itinerary details" })).not.toBeInTheDocument();
+  });
+
   it("keeps total, readiness, and every manual tab visible", () => {
     render(<TripWorkspace initialPlan={buildSwitzerlandFamilyTrip()} />);
 
     const status = within(screen.getByRole("banner", { name: "Trip status" }));
-    expect(status.getByText("Group total")).toBeVisible();
-    expect(status.getByText(/Review needed/i)).toBeVisible();
+    expect(status.getByText("Total cost")).toBeVisible();
+    expect(status.getByText(/mountain railways/)).toBeVisible();
     for (const tab of [
       "Overview",
       "Travel",
@@ -51,7 +80,7 @@ describe("trip route", () => {
       screen.getByRole("textbox", { name: "Destination" }),
       "Bernese Oberland",
     );
-    await user.click(screen.getByRole("button", { name: "Build my travel plan" }));
+    await user.click(screen.getByRole("button", { name: "Plan my trip" }));
 
     expect(await screen.findByRole("main", { name: "Trip planning workspace" })).toBeVisible();
     expect(screen.getByText("Synthetic demonstration data")).toBeVisible();
@@ -60,16 +89,16 @@ describe("trip route", () => {
     expect(screen.getByText("Synthetic demonstration data")).toBeVisible();
   });
 
-  it("uses the submitted origin when opening an inspire-me plan", async () => {
+  it("returns to the editable brief from the generated plan", async () => {
     const user = userEvent.setup();
     render(<Home />);
 
-    await user.click(screen.getByRole("radio", { name: "Inspire me" }));
     await user.type(screen.getByRole("textbox", { name: "Origin" }), "Basel");
-    await user.click(screen.getByRole("button", { name: "Build my travel plan" }));
+    await user.type(screen.getByRole("textbox", { name: "Destination" }), "Interlaken");
+    await user.click(screen.getByRole("button", { name: "Plan my trip" }));
 
-    expect(await screen.findByRole("heading", { name: "Recommended travel plan" })).toBeVisible();
-    expect(screen.getByText("Synthetic demonstration data")).toBeVisible();
+    await user.click(await screen.findByRole("button", { name: "EDIT BRIEF ↗" }));
+    expect(screen.getByRole("heading", { name: "Plan your best trip. Stay within budget." })).toBeVisible();
   });
 
   it("accepts a user-entered known destination", async () => {
@@ -78,7 +107,7 @@ describe("trip route", () => {
 
     await user.type(screen.getByRole("textbox", { name: "Origin" }), "Stockholm");
     await user.type(screen.getByRole("textbox", { name: "Destination" }), "Paris");
-    await user.click(screen.getByRole("button", { name: "Build my travel plan" }));
+    await user.click(screen.getByRole("button", { name: "Plan my trip" }));
 
     expect(await screen.findByRole("heading", { name: "Stockholm to Paris travel plan" })).toBeVisible();
   });
