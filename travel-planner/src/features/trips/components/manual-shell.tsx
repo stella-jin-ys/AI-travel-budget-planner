@@ -3,8 +3,9 @@
 import type { ReactNode } from "react";
 import type { PlanSection } from "../domain/trip";
 import type { TripWorkspaceState } from "../state/trip-reducer";
-import { sections, SectionTabs } from "./section-tabs";
+import { formatMoney } from "../domain/money";
 import { StatusRail } from "./status-rail";
+import { sections, SectionTabs } from "./section-tabs";
 
 export function ManualShell(props: {
   state: TripWorkspaceState;
@@ -12,13 +13,18 @@ export function ManualShell(props: {
   leaf: ReactNode;
   mobileToday?: ReactNode;
   onSectionChange: (section: PlanSection) => void;
+  onBack?: () => void;
 }) {
   return (
     <main className="manual-shell" aria-label="Trip planning workspace">
+      <header className="mobile-workspace-header" aria-label="Mobile trip summary">
+        <div className="mobile-workspace-header__brand"><b aria-hidden="true">✦</b><strong>AI Travel Budget Manager</strong></div>
+        <div className="mobile-workspace-header__meta"><button type="button" onClick={props.onBack}>Back</button><span><small>Total cost</small><strong>{formatMoney(props.state.budget.total, "en-CH")}</strong></span></div>
+      </header>
       <header className="prism-top" aria-label="Planner identity">
         <div className="prism-brand"><b aria-hidden="true">✦</b><strong>AI TRAVEL BUDGET PLANNER</strong></div>
         <span>EUROPE / {props.state.plan.currency}</span>
-        <span className="demo-tag"><i aria-hidden="true" /> SYNTHETIC DEMO</span>
+        <span className="demo-tag"><i aria-hidden="true" /> AI PLAN</span>
       </header>
       <StatusRail
         budget={props.state.budget}
@@ -46,10 +52,9 @@ export function ManualShell(props: {
           </section>
         );
       })}
-      <SectionTabs
-        active={props.state.activeSection}
-        onChange={props.onSectionChange}
-      />
+      <div className="legacy-section-tabs">
+        <SectionTabs active={props.state.activeSection} onChange={props.onSectionChange} />
+      </div>
     </main>
   );
 }

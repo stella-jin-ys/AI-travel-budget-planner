@@ -46,30 +46,21 @@ export function StatusRail({
   const warningCount = readiness.issues.length;
 
   return (
-    <header className="status-rail" aria-label="Trip status">
+    <header className="status-rail status-rail--compact-mobile" aria-label="Trip status">
       <dl className="status-rail__metric">
-        <dt>Group total</dt>
-        <dd>{formatMoney(budget.total)}</dd>
-      </dl>
-      <dl className="status-rail__metric">
-        <dt>Per person</dt>
-        <dd>{formatMoney(budget.perPerson)}</dd>
+        <dt>Total cost</dt>
+        <dd>
+          {formatMoney(budget.total)}
+          <small className="status-rail__per-person"><span>Per person</span> {formatMoney(budget.perPerson)}</small>
+        </dd>
       </dl>
       <dl className="status-rail__metric">
         <dt>Trip</dt>
       <dd>{plan.brief.endDate ? `${plan.days.length} nights / ${plan.brief.travelers.length} travellers` : "Trip"}</dd>
       </dl>
       <dl className="status-rail__metric" data-warning={warningCount > 0}>
-        <dt>Readiness</dt>
-        <dd>{readinessLabels[readiness.state]}</dd>
-      </dl>
-      <dl className="status-rail__metric status-rail__metric--compact">
-        <dt>Checks</dt>
-        <dd>{plan.items.filter((item) => item.alternatives.some((alternative) => alternative.id === item.selectedAlternativeId && Boolean(alternative.evidence.checkedAt))).length}</dd>
-      </dl>
-      <dl className="status-rail__metric status-rail__metric--compact">
-        <dt>Warnings</dt>
-        <dd>{warningCount}</dd>
+        <dt>Priority</dt>
+        <dd className="status-rail__priority">{plan.brief.purpose || plan.brief.interests.join(", ") || readinessLabels[readiness.state]}</dd>
       </dl>
     </header>
   );
