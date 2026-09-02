@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { POST } from "@/app/api/plan/route";
 
+const supabaseInsert = vi.fn().mockResolvedValue({ error: null });
+vi.mock("@supabase/supabase-js", () => ({
+  createClient: vi.fn(() => ({ from: vi.fn(() => ({ insert: supabaseInsert })) })),
+}));
+
 function tripRequest() {
   return new Request("http://localhost/api/plan", {
     method: "POST",
@@ -68,6 +73,10 @@ afterEach(() => {
   vi.unstubAllGlobals();
   delete process.env.GEMINI_API_KEY;
   delete process.env.OPENROUTER_API_KEY;
+  delete process.env.SUPABASE_URL;
+  delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+  supabaseInsert.mockReset();
+  supabaseInsert.mockResolvedValue({ error: null });
 });
 
 describe("POST /api/plan", () => {
@@ -130,5 +139,27 @@ describe("POST /api/plan", () => {
       links: [{ label: "Book with SNCF Connect", url: "https://www.sncf-connect.com/" }],
     }));
     expect(result).not.toHaveProperty("raw");
+  });
+
+  it("reports a persistence failure after a valid AI response", async () => {
+    process.env.GEMINI_API_KEY = "gemini-test-key";
+    process.env.SUPABASE_URL = "https://example.supabase.co";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-test-key";
+    supabaseInsert.mockResolvedValueOnce({ error: { message: "database unavailable" } });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        model: "gemini-3.5-flash-lite",
+        steps: [{ type: "model_output", content: [{ type: "text", text: JSON.stringify(groundedPlan()) }] }],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await POST(tripRequest());
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: "Trip plan could not be saved. Please try again." });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

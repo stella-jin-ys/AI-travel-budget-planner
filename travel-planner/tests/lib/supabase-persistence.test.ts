@@ -39,4 +39,13 @@ describe("persistTripPlan", () => {
     await expect(persistTripPlan(brief, plan)).resolves.toBe(true);
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({ brief, plan, created_at: expect.any(String) }));
   });
+
+  it("surfaces a configured Supabase insert failure", async () => {
+    process.env.SUPABASE_URL = "https://example.supabase.co";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-test-key";
+    insert.mockResolvedValueOnce({ error: { message: "database unavailable" } });
+    const { persistTripPlan } = await import("@/lib/supabase/persistence");
+
+    await expect(persistTripPlan(brief, plan)).rejects.toThrow("Supabase trip persistence failed");
+  });
 });

@@ -1,6 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import type { TripBrief, TripPlan } from "@/features/trips/domain/trip";
 
+const persistenceErrorMessage = "Supabase trip persistence failed";
+
 export async function persistTripPlan(brief: TripBrief, plan: TripPlan): Promise<boolean> {
   const url = process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -11,11 +13,12 @@ export async function persistTripPlan(brief: TripBrief, plan: TripPlan): Promise
     const { error } = await supabase.from("trip_plans").insert({ brief, plan, created_at: new Date().toISOString() });
     if (error) {
       console.error("Supabase trip persistence failed", error.message);
-      return false;
+      throw new Error(persistenceErrorMessage);
     }
     return true;
   } catch (error) {
     console.error("Supabase trip persistence failed", error);
-    return false;
+    if (error instanceof Error && error.message === persistenceErrorMessage) throw error;
+    throw new Error(persistenceErrorMessage);
   }
 }

@@ -163,7 +163,10 @@ export async function POST(request: Request) {
     const plan = normalizePlan(parseModelJson(content), brief);
     await persistTripPlan(brief, plan);
     return NextResponse.json({ plan, retrievedAt: new Date().toISOString(), providerId: `${provider.id}-${payload.model ?? provider.model}` });
-  } catch {
-    return NextResponse.json({ error: "AI model is overloaded. Try again later." }, { status: 503 });
+  } catch (error) {
+    const message = error instanceof Error && error.message === "Supabase trip persistence failed"
+      ? "Trip plan could not be saved. Please try again."
+      : "AI model is overloaded. Try again later.";
+    return NextResponse.json({ error: message }, { status: 503 });
   }
 }
