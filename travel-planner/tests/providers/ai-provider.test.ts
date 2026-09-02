@@ -21,4 +21,14 @@ describe("AI trip provider", () => {
       "The AI planner endpoint is unavailable on this deployment.",
     );
   });
+
+  it("reports an unavailable endpoint when a static host rejects the API without a content type", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      new Response("<html><body>405 Not Allowed</body></html>", { status: 405 }),
+    ));
+
+    await expect(new AITripProvider().search(brief)).rejects.toThrow(
+      "The AI planner endpoint is unavailable on this deployment.",
+    );
+  });
 });

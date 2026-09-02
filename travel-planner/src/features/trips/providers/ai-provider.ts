@@ -11,9 +11,11 @@ export class AITripProvider implements TripDataProvider {
     const contentType = typeof response.headers?.get === "function"
       ? response.headers.get("content-type") ?? ""
       : "";
-    if (contentType && !contentType.includes("application/json")) {
+    const isJson = contentType.includes("application/json");
+    const endpointUnavailable = (response.status === 404 || response.status === 405) && !isJson;
+    if (endpointUnavailable || (contentType && !isJson)) {
       throw new Error(
-        response.status === 404
+        endpointUnavailable
           ? "The AI planner endpoint is unavailable on this deployment."
           : "The AI planner returned an invalid response. Please try again.",
       );
