@@ -11,6 +11,7 @@ import type {
 } from "../state/trip-reducer";
 import { ErrataSlip } from "./errata-slip";
 import { SourceBadge } from "./source-badge";
+import { displayDemoCopy } from "./demo-copy";
 
 interface OptionRowProps {
   item: PlanItem;
@@ -18,6 +19,7 @@ interface OptionRowProps {
   locked: boolean;
   onReplace: (alternativeId: string) => void;
   onToggleLock: () => void;
+  showControls?: boolean;
 }
 
 export function OptionRow({
@@ -26,6 +28,7 @@ export function OptionRow({
   locked,
   onReplace,
   onToggleLock,
+  showControls = true,
 }: OptionRowProps) {
   const [pending, setPending] = useState<PlanAlternative | null>(null);
   const selected = item.alternatives.find(
@@ -52,8 +55,8 @@ export function OptionRow({
     <article className="option-row" aria-labelledby={`${item.id}-title`}>
       <header className="option-row__heading">
         <div>
-          <h2 id={`${item.id}-title`}>{item.label}</h2>
-          <p>{selected.label}</p>
+          <h2 id={`${item.id}-title`}>{displayDemoCopy(item.label)}</h2>
+          <p>{displayDemoCopy(selected.label)}</p>
         </div>
         <strong className="option-row__cost">
           {formatMoney(alternativeTotal(selected), "en-CH")}
@@ -62,7 +65,7 @@ export function OptionRow({
 
       <div className="option-row__source">
         <SourceBadge status={selected.evidence.status} />
-        <span>{selected.evidence.supplierName}</span>
+        <span>{displayDemoCopy(selected.evidence.supplierName)}</span>
         {selected.evidence.sourceUrl ? (
           <a href={selected.evidence.sourceUrl} target="_blank" rel="noreferrer">
             Supplier source
@@ -70,26 +73,49 @@ export function OptionRow({
         ) : null}
       </div>
 
-      <div className="option-row__controls">
-        <button type="button" onClick={toggleLock} aria-pressed={locked}>
-          {locked ? `Unlock ${item.label}` : `Lock ${item.label}`}
-        </button>
-        <button
-          type="button"
-          disabled={locked || replacements.length === 0}
-          onClick={() => setPending(replacements[0] ?? null)}
-        >
-          Replace {item.label.toLowerCase()}
-        </button>
-      </div>
+      {selected.details?.length ? (
+        <dl className="option-row__details">
+          {selected.details.map((detail) => (
+            <div key={detail.label}>
+              <dt>{detail.label}</dt>
+              <dd>{detail.value}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
 
-      {locked ? <p className="option-row__locked">{item.label} locked</p> : null}
+      {selected.links?.length ? (
+        <div className="option-row__links">
+          {selected.links.map((link) => (
+            <a key={link.url} href={link.url} target="_blank" rel="noreferrer">
+              {link.label}
+            </a>
+          ))}
+        </div>
+      ) : null}
 
-      {pending ? (
+      {showControls ? (
+        <div className="option-row__controls">
+          <button type="button" onClick={toggleLock} aria-pressed={locked}>
+            {locked ? `Unlock ${displayDemoCopy(item.label)}` : `Lock ${displayDemoCopy(item.label)}`}
+          </button>
+          <button
+            type="button"
+            disabled={locked || replacements.length === 0}
+            onClick={() => setPending(replacements[0] ?? null)}
+          >
+            Replace {displayDemoCopy(item.label).toLowerCase()}
+          </button>
+        </div>
+      ) : null}
+
+      {showControls && locked ? <p className="option-row__locked">{displayDemoCopy(item.label)} locked</p> : null}
+
+      {showControls && pending ? (
         <div
           className="option-row__confirmation"
           role="dialog"
-          aria-label={`Replace ${item.label}`}
+          aria-label={`Replace ${displayDemoCopy(item.label)}`}
         >
           <h3>Confirm replacement</h3>
           {replacements.length > 1 ? (
@@ -101,17 +127,17 @@ export function OptionRow({
                   aria-pressed={pending.id === candidate.id}
                   onClick={() => setPending(candidate)}
                 >
-                  Preview {candidate.label.toLowerCase()}
+                  Preview {displayDemoCopy(candidate.label).toLowerCase()}
                 </button>
               ))}
             </div>
           ) : null}
           <p className="option-row__delta">{describeCostDelta(selected, pending)}</p>
-          <p>{pending.label}</p>
+          <p>{displayDemoCopy(pending.label)}</p>
           <SourceBadge status={pending.evidence.status} />
           <div className="option-row__controls">
             <button type="button" disabled={locked} onClick={commitReplacement}>
-              Use {pending.label.toLowerCase()}
+              Use {displayDemoCopy(pending.label).toLowerCase()}
             </button>
             <button type="button" onClick={() => setPending(null)}>
               Cancel

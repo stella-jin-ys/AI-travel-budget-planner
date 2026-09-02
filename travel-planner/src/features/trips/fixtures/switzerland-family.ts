@@ -272,6 +272,41 @@ export function buildSwitzerlandFamilyTrip(): TripPlan {
     ),
   );
 
+  railTransfer.details = [
+    { label: "Supplier", value: "Alpine Rail" },
+    { label: "Transport", value: "Family rail connection" },
+    { label: "Route", value: "Basel SBB → Interlaken Ost" },
+    { label: "Departure", value: "10:00" },
+    { label: "Arrival", value: "12:30" },
+    { label: "Duration", value: "2 h 30 min" },
+  ];
+  railTransfer.links = [{ label: "Book with Alpine Rail", url: "https://example.invalid/synthetic/alpine-rail/book" }];
+  familyRoom.details = [
+    { label: "Supplier", value: "Alpenblick Lodge" },
+    { label: "City", value: "Interlaken" },
+    { label: "Accommodation", value: "Hotel · family room" },
+    { label: "Cost per night", value: "CHF 180.00" },
+    { label: "Duration", value: "3 nights" },
+    { label: "Total", value: "CHF 540.00" },
+  ];
+  familyRoom.links = [{ label: "Book with Alpenblick Lodge", url: "https://example.invalid/synthetic/alpenblick/book" }];
+  meals.details = [
+    { label: "City", value: "Interlaken" },
+    { label: "Supermarket", value: "Coop Interlaken · 500 m from the stay" },
+    { label: "Restaurant", value: "Bernese Dining · 800 m from the stay" },
+  ];
+  meals.links = [{ label: "Bernese Dining Demo", url: "https://example.invalid/synthetic/bernese-dining" }];
+  activityBundle.details = [
+    { label: "City", value: "Interlaken" },
+    { label: "Attractions", value: "Harder Kulm, lake promenade, and family museum" },
+  ];
+  activityBundle.links = [{ label: "Local attractions", url: "https://example.invalid/synthetic/interlaken-attractions" }];
+  regionalPass.details = [
+    { label: "Mode", value: "Regional public transport pass" },
+    { label: "Price", value: "CHF 66.00 per person" },
+  ];
+  regionalPass.links = [{ label: "Bernese Pass Demo", url: "https://example.invalid/synthetic/bernese-pass" }];
+
   return {
     id: "switzerland-family-synthetic",
     title: "Synthetic Switzerland family trip: Basel to Bernese Oberland",
@@ -312,60 +347,102 @@ export function buildSwitzerlandFamilyTrip(): TripPlan {
       {
         id: "day-1",
         date: "2026-09-10",
-        title: "Synthetic schedule: Basel arrival and Interlaken transfer",
+        title: "Basel to Interlaken transfer",
         items: [
           {
             id: "day-1-transfer",
             planItemId: "basel-to-interlaken",
-            label: "Synthetic 10:00 Basel to Interlaken rail connection",
+            label: "Depart Basel SBB 10:00 · arrive Interlaken Ost 12:30",
             startsAt: "2026-09-10T10:00:00+02:00",
             endsAt: "2026-09-10T12:30:00+02:00",
             directionsUrl: "https://example.invalid/synthetic/directions/basel-interlaken",
+          },
+          {
+            id: "day-1-lunch",
+            planItemId: "family-meals",
+            label: "Family lunch near Interlaken Ost",
+            startsAt: "2026-09-10T13:00:00+02:00",
+            endsAt: "2026-09-10T14:00:00+02:00",
+          },
+          {
+            id: "day-1-walk",
+            planItemId: "family-activities",
+            label: "Lakeside orientation walk",
+            startsAt: "2026-09-10T15:00:00+02:00",
+            endsAt: "2026-09-10T17:00:00+02:00",
           },
         ],
       },
       {
         id: "day-2",
         date: "2026-09-11",
-        title: "Synthetic schedule: family mountain day",
+        title: "Family mountain day",
         items: [
           {
             id: "day-2-activity",
             planItemId: "family-activities",
-            label: "Synthetic 09:30 family mountain activity",
+            label: "Mountain activity and cable-car loop",
             startsAt: "2026-09-11T09:30:00+02:00",
             endsAt: "2026-09-11T15:30:00+02:00",
             directionsUrl: "https://example.invalid/synthetic/directions/mountain-day",
+          },
+          {
+            id: "day-2-lunch",
+            planItemId: "family-meals",
+            label: "Picnic lunch with valley views",
+            startsAt: "2026-09-11T12:30:00+02:00",
+            endsAt: "2026-09-11T13:30:00+02:00",
           },
         ],
       },
       {
         id: "day-3",
         date: "2026-09-12",
-        title: "Synthetic schedule: museum and lakeside walk",
+        title: "Museum and lakeside walk",
         items: [
           {
             id: "day-3-activity",
             planItemId: "family-activities",
-            label: "Synthetic 10:00 family museum visit",
+            label: "Family museum visit",
             startsAt: "2026-09-12T10:00:00+02:00",
             endsAt: "2026-09-12T13:00:00+02:00",
             directionsUrl: "https://example.invalid/synthetic/directions/family-museum",
+          },
+          {
+            id: "day-3-lunch",
+            planItemId: "family-meals",
+            label: "Lunch at a local family café",
+            startsAt: "2026-09-12T13:15:00+02:00",
+            endsAt: "2026-09-12T14:15:00+02:00",
+          },
+          {
+            id: "day-3-walk",
+            planItemId: "family-activities",
+            label: "Lakeside walk and playground stop",
+            startsAt: "2026-09-12T14:30:00+02:00",
+            endsAt: "2026-09-12T17:00:00+02:00",
           },
         ],
       },
       {
         id: "day-4",
         date: "2026-09-13",
-        title: "Synthetic schedule: local transit and departure",
+        title: "Local transit and departure",
         items: [
           {
             id: "day-4-transit",
             planItemId: "bernese-local-transit",
-            label: "Synthetic 09:00 regional-pass travel comparison",
+            label: "Depart Interlaken Ost 09:00 · arrive Basel SBB 11:00",
             startsAt: "2026-09-13T09:00:00+02:00",
             endsAt: "2026-09-13T11:00:00+02:00",
             directionsUrl: "https://example.invalid/synthetic/directions/regional-pass",
+          },
+          {
+            id: "day-4-breakfast",
+            planItemId: "family-meals",
+            label: "Breakfast before departure",
+            startsAt: "2026-09-13T07:30:00+02:00",
+            endsAt: "2026-09-13T08:30:00+02:00",
           },
         ],
       },

@@ -37,7 +37,7 @@ export function MobileToday({ plan, now }: { plan: TripPlan; now: Date }) {
               <h3>{next.label}</h3>
               <p>
                 <time dateTime={next.startsAt}>{localTime(next.startsAt)}</time>
-                {"–"}
+                {"-"}
                 <time dateTime={next.endsAt}>{localTime(next.endsAt)}</time>
               </p>
               {next.directionsUrl ? (

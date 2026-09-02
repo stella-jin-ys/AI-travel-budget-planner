@@ -1,4 +1,5 @@
 import type { PlanIssue } from "../domain/readiness";
+import { displayDemoCopy } from "./demo-copy";
 import { SourceBadge } from "./source-badge";
 
 export function ErrataSlip({ issue, now }: { issue: PlanIssue; now: Date }) {
@@ -6,18 +7,18 @@ export function ErrataSlip({ issue, now }: { issue: PlanIssue; now: Date }) {
     <div
       className="errata-slip"
       role="alert"
-      aria-label={`${issue.message} for ${issue.itemId}`}
+      aria-label={`${displayDemoCopy(issue.message)} for ${issue.itemId}`}
       data-item-id={issue.itemId}
     >
       <div className="errata-slip__heading">
         <SourceBadge status={issue.status} />
-        <strong>{issue.message}</strong>
+        <strong>{displayDemoCopy(issue.message)}</strong>
       </div>
-      <p className="errata-slip__impact">{issue.impact}</p>
+      <p className="errata-slip__impact">{displayDemoCopy(issue.impact)}</p>
       <dl className="errata-slip__meta">
         <div>
           <dt>Supplier</dt>
-          <dd>{issue.supplierName}</dd>
+          <dd>{displayDemoCopy(issue.supplierName)}</dd>
         </div>
         <div>
           <dt>Last checked</dt>

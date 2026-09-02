@@ -1,5 +1,4 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import { ChecksLeaf } from "@/features/trips/components/checks-leaf";
 import { TripWorkspace } from "@/features/trips/components/trip-workspace";
@@ -8,14 +7,14 @@ import { buildSwitzerlandFamilyTrip } from "@/features/trips/fixtures/switzerlan
 afterEach(cleanup);
 
 describe("planning leaves", () => {
-  it("renders content for every declared planner leaf", async () => {
-    const user = userEvent.setup();
+  it("keeps recommendations accessible without the removed schedule tabs", () => {
     render(<TripWorkspace initialPlan={buildSwitzerlandFamilyTrip()} />);
 
-    for (const name of ["Overview", "Travel", "Stay", "Days", "Food", "Budget", "Checks"]) {
-      await user.click(screen.getByRole("tab", { name }));
-      expect(screen.getByRole("heading", { name, level: 1 })).toBeVisible();
+    for (const name of ["Overview", "Transportation", "Stay", "Food", "Activities", "Local transport", "Itinerary"]) {
+      expect(screen.getByRole("button", { name })).toBeVisible();
     }
+
+    expect(screen.queryByRole("tablist", { name: "Trip sections" })).not.toBeInTheDocument();
   });
 
   it("groups plan checks under their source status", () => {

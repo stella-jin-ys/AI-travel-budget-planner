@@ -36,14 +36,24 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # AI Travel Budget Planner
 
-Europe-first synthetic-data MVP for solo, student, family, and short ski-trip planning.
+Europe-first AI travel planning for solo, student, family, and short ski-trip planning.
 
 ## Run
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
+
+Add a server-side OpenRouter key to `.env.local`:
+
+```dotenv
+OPENROUTER_API_KEY=your_key_here
+OPENROUTER_MODEL=minimax/minimax-m3:free
+```
+
+The server route supports structured JSON output from the configured provider. Availability, latency, and daily request limits can vary, so the UI keeps the trip brief recoverable when generation is overloaded.
 
 ## Verify
 
@@ -55,4 +65,4 @@ npm run lint
 npm run build
 ```
 
-The current release is a deterministic guided demo. It uses a Switzerland family fixture and does not call live suppliers, live AI, booking/payment systems, authentication, persistence, or offline reload. Prices and sources are visibly synthetic; supplier links are placeholders for the later live-provider release.
+The guided flow generates plans through the server-only `/api/plan` route and validates model output before it reaches the workspace. It does not connect to live booking/payment systems, persist accounts, or claim live supplier availability without a source URL.

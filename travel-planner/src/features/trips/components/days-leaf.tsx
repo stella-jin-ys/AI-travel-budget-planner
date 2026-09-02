@@ -16,7 +16,7 @@ export function DaysLeaf({
     <div className="workspace-leaf">
       <h1>Days</h1>
       <p className="leaf-intro">
-        Review synthetic timings alongside walking, transit, meal, and rest gaps.
+        Review AI-planned timings alongside walking, transit, meal, and rest gaps.
       </p>
       <div className="day-list">
         {state.plan.days.map((day) => (
@@ -32,7 +32,7 @@ export function DaysLeaf({
                     <strong>{item.label}</strong>
                     <p>
                       <time dateTime={item.startsAt}>{localTime(item.startsAt)}</time>
-                      {"–"}
+                      {"-"}
                       <time dateTime={item.endsAt}>{localTime(item.endsAt)}</time>
                     </p>
                   </div>

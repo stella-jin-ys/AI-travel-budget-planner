@@ -16,7 +16,7 @@ export function TravelLeaf({
     <div className="workspace-leaf">
       <h1>Travel</h1>
       <p className="leaf-intro">
-        Door-to-door legs, transfer timing, and the synthetic pass comparison.
+        Door-to-door legs, transfer timing, and the AI-generated pass comparison.
       </p>
       <EditableItemList state={state} dispatch={dispatch} section="travel" />
     </div>

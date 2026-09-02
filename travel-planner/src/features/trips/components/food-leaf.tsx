@@ -24,7 +24,7 @@ export function FoodLeaf({
     <div className="workspace-leaf">
       <h1>Food</h1>
       <p className="leaf-intro">
-        Balance restaurant, takeaway, and supermarket choices in the synthetic allowance.
+        Balance restaurant, takeaway, and supermarket choices in the AI estimate.
       </p>
       <dl className="fact-list fact-list--compact">
         <div>

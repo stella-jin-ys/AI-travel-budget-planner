@@ -7,6 +7,7 @@ import type { CostCategory } from "../domain/trip";
 import type { TripWorkspaceAction, TripWorkspaceState } from "../state/trip-reducer";
 import { ErrataSlip } from "./errata-slip";
 import { OptionRow } from "./option-row";
+import { displayDemoCopy } from "./demo-copy";
 
 const cards = [
   { id: "overview", label: "Overview", description: "Whole trip at a glance", categories: [] },
@@ -27,38 +28,50 @@ function totalFor(state: TripWorkspaceState, categories: readonly CostCategory[]
   return values.length ? money(values.reduce((sum, value) => sum.plus(value.amount), new Decimal(0)).toFixed(2), values[0].currency) : null;
 }
 
+function priorityLabel(state: TripWorkspaceState) {
+  const labels = {
+    balanced: "Balanced spending",
+    activities: "Activities",
+    stays: "Stays",
+    food: "Food",
+  } as const;
+  const preference = state.plan.brief.spendingPreference;
+  return preference ? labels[preference] : "Balanced spending";
+}
+
 function CardDetails({ card, state, dispatch }: { card: (typeof cards)[number]; state: TripWorkspaceState; dispatch: Dispatch<TripWorkspaceAction> }) {
-  if (card.id === "overview") return <div className="overview-card__details"><p>Review the ledger below, then choose a category card to inspect sources, freshness, warnings, and supplier links.</p></div>;
-  if (card.id === "itinerary") return <div className="overview-card__details overview-card__itinerary">{state.plan.days.map((day) => <div key={day.id}><b>{day.date}</b>{day.items.map((entry) => <span key={entry.id}><br />{entry.startsAt.slice(11, 16)} {entry.label}</span>)}</div>)}</div>;
+  if (card.id === "overview") return <div className="overview-card__details">
+    <div className="overview-brief">
+      <h3>Trip brief</h3>
+      <dl>
+        <div><dt>Route</dt><dd>{state.plan.brief.origin} → {state.plan.brief.destination ?? "Flexible destination"}</dd></div>
+        <div><dt>Dates</dt><dd>{state.plan.brief.startDate} – {state.plan.brief.endDate}</dd></div>
+        <div><dt>Travelers</dt><dd>{state.plan.brief.travelers.length}</dd></div>
+        <div><dt>Priority</dt><dd>{priorityLabel(state)}</dd></div>
+        <div><dt>Total cost</dt><dd>{formatMoney(state.budget.total, "en-CH")}</dd></div>
+      </dl>
+    </div>
+    <p>Review recommendations below, then choose a category card to inspect sources, freshness, warnings, and supplier links.</p>
+  </div>;
+  if (card.id === "itinerary") return <div className="overview-card__details overview-card__itinerary">{state.plan.days.map((day) => <section className="itinerary-day" key={day.id}><div><b>{day.title}</b><time dateTime={day.date}>{day.date}</time></div><ul>{day.items.map((entry) => <li key={entry.id}><time dateTime={entry.startsAt}>{entry.startsAt.slice(11, 16)}</time><span>{entry.label}</span></li>)}</ul></section>)}</div>;
   const detailItems = state.plan.items.filter((item) => item.alternatives.some((option) => option.id === item.selectedAlternativeId && (option.category === card.id || item.section === card.id)));
-  return <div className="overview-card__details"><p className="overview-details__source">Supplier source: {state.plan.items.flatMap((item) => item.alternatives.map((option) => option.evidence.supplierName)).filter(Boolean).join(", ")}</p>{detailItems.length ? detailItems.map((item) => <div className="overview-detail-item" key={item.id}><OptionRow item={item} alternatives={item.alternatives} locked={state.lockedItemIds.includes(item.id)} onReplace={(alternativeId) => dispatch({ type: "replace-option", itemId: item.id, alternativeId })} onToggleLock={() => dispatch({ type: "toggle-lock", itemId: item.id })} />{state.readiness.issues.filter((issue) => issue.itemId === item.id).map((issue, index) => <ErrataSlip issue={issue} now={demoNow} key={`${issue.itemId}-${issue.status}-${index}`} />)}</div>) : <p>No selected items in this section yet.</p>}{state.readiness.issues.length > 0 ? <div className="overview-card-warning"><strong>Checks to review</strong>{state.readiness.issues.map((issue, index) => <ErrataSlip issue={issue} now={demoNow} key={`${issue.itemId}-${issue.status}-${index}`} />)}</div> : null}</div>;
+  const suppliers = detailItems.flatMap((item) => item.alternatives.map((option) => option.evidence.supplierName)).filter(Boolean).map(displayDemoCopy).join(", ");
+  return <div className="overview-card__details"><p className="overview-details__source">Supplier source: {suppliers || "No supplier source provided"}</p>{detailItems.length ? detailItems.map((item) => <div className="overview-detail-item" key={item.id}><OptionRow item={item} alternatives={item.alternatives} locked={state.lockedItemIds.includes(item.id)} onReplace={(alternativeId) => dispatch({ type: "replace-option", itemId: item.id, alternativeId })} onToggleLock={() => dispatch({ type: "toggle-lock", itemId: item.id })} showControls={false} />{state.readiness.issues.filter((issue) => issue.itemId === item.id).map((issue, index) => <ErrataSlip issue={issue} now={demoNow} key={`${issue.itemId}-${issue.status}-${index}`} />)}</div>) : <p>No selected items in this section yet.</p>}</div>;
 }
 
 function CardGrid({ state, selectedCard, onSelect, dispatch }: { state: TripWorkspaceState; selectedCard: CardId | null; onSelect: (card: CardId) => void; dispatch: Dispatch<TripWorkspaceAction> }) {
-  return <section className="overview-card-grid" aria-label="Plan sections">{cards.map((card) => { const total = card.id === "overview" ? totalFor(state, ["transport", "stay", "food", "activities", "local-transit"]) : card.id === "itinerary" ? null : totalFor(state, card.categories); const stayItem = state.plan.items.find((item) => item.id === "family-room"); const supplier = card.id === "stay" ? stayItem?.alternatives[0]?.evidence.supplierName : null; const selected = selectedCard === card.id; return <article className={`overview-card${selected ? " is-selected" : ""}`} key={card.id}><button type="button" aria-label={card.label} className="overview-card__trigger" aria-expanded={selected} onClick={() => onSelect(card.id)}><span className="overview-card__label">{card.label}</span><small>{card.description}{supplier ? ` · ${supplier}` : ""}</small><strong>{total ? formatMoney(total, "en-CH") : card.id === "itinerary" ? `${state.plan.days.length} days` : "Included"}</strong><span className="overview-card__hint">{selected ? "Hide details" : "View details"}</span></button>{selected ? <CardDetails card={card} state={state} dispatch={dispatch} /> : null}</article>; })}</section>;
-}
-
-function LedgerSummary({ state }: { state: TripWorkspaceState }) {
-  return <div className="prism-table"><div className="prism-row head"><span>LINE ITEM</span><span>SOURCE</span><span>AMOUNT</span></div>{state.plan.items.filter((item) => item.selectedAlternativeId).map((item) => { const option = item.alternatives.find((candidate) => candidate.id === item.selectedAlternativeId); if (!option) return null; const total = totalFor({ ...state, plan: { ...state.plan, items: [item] } }, [option.category]); return <div className="prism-row" key={item.id}><span>{item.label}</span><small>{option.evidence.status} estimate</small><strong>{total ? formatMoney(total, "en-CH") : "—"}</strong></div>; })}</div>;
+  return <section className="overview-card-grid" aria-label="Plan sections">{cards.map((card) => { const total = card.id === "overview" || card.id === "itinerary" ? null : totalFor(state, card.categories); const selected = selectedCard === card.id; return <article className={`overview-card${selected ? " is-selected" : ""}`} key={card.id}><button type="button" aria-label={card.label} className="overview-card__trigger" aria-expanded={selected} onClick={() => onSelect(card.id)}><span className="overview-card__label">{card.label}</span><small>{card.description}</small><strong className="overview-card__cost">{total ? formatMoney(total, "en-CH") : card.id === "itinerary" ? `${state.plan.days.length} days` : card.id === "overview" ? "Summary" : "Included"}</strong><span className="overview-card__hint" aria-hidden="true">{selected ? "−" : "+"}</span></button>{selected ? <CardDetails card={card} state={state} dispatch={dispatch} /> : null}</article>; })}</section>;
 }
 
 export function OverviewLeaf({ state, dispatch }: { state: TripWorkspaceState; dispatch: Dispatch<TripWorkspaceAction> }) {
-  const [selectedCard, setSelectedCard] = useState<CardId | null>(null);
-  const activeCard = cards.find((card) => card.id === selectedCard);
+  const [selectedCard, setSelectedCard] = useState<CardId | null>("overview");
   const toggleCard = (card: CardId) => setSelectedCard((current) => current === card ? null : card);
-  if (!activeCard) {
-    return <div className="workspace-leaf">
-      <div className="prism-heading"><div><small className="eyebrow">ACTIVE LEDGER</small><h1>Overview</h1></div><small>LAST CHECKED 24 AUG 2026 · 14:32</small></div>
-      <div className="prism-hero"><div><small className="eyebrow">THE SHORT VERSION</small><h2 className="prism-plan-title">{state.plan.title}</h2><p className="prism-tagline"><em>kept under the line.</em></p><p>Route, stay, activities, and food are combined into one explainable plan. Choose a card to inspect its recommendations, cost, and source status.</p></div></div>
-      <CardGrid state={state} selectedCard={selectedCard} onSelect={toggleCard} dispatch={dispatch} />
-      <LedgerSummary state={state} />
-      <p className="overview-card-grid__hint">Select a card above to see its details and any checks.</p>
-    </div>;
-  }
+  const destination = state.plan.brief.destination ?? "Flexible destination";
   return <div className="workspace-leaf">
-    <div className="prism-heading"><div><small className="eyebrow">ACTIVE LEDGER</small><h1>Overview</h1></div><small>LAST CHECKED 24 AUG 2026 · 14:32</small></div>
-    <div className="prism-hero"><div><small className="eyebrow">THE SHORT VERSION</small><h2 className="prism-plan-title">{state.plan.title}</h2><p className="prism-tagline"><em>kept under the line.</em></p><p>Choose another card to compare the rest of the plan.</p></div></div>
+    <section className="recommendations-intro" aria-label="Trip plan summary">
+      <div className="prism-hero"><div><h2 className="prism-plan-title">{state.plan.brief.origin} to {destination} travel plan</h2><p>Choose a card to inspect recommendations, cost, sources, and any checks.</p></div></div>
+    </section>
     <CardGrid state={state} selectedCard={selectedCard} onSelect={toggleCard} dispatch={dispatch} />
-    <div className="prism-table"><div className="prism-row head"><span>LINE ITEM</span><span>SOURCE</span><span>AMOUNT</span></div>{state.plan.items.filter((item) => item.selectedAlternativeId).map((item) => { const option = item.alternatives.find((candidate) => candidate.id === item.selectedAlternativeId); if (!option) return null; const total = totalFor({ ...state, plan: { ...state.plan, items: [item] } }, [option.category]); return <div className="prism-row" key={item.id}><span>{item.label}</span><small>{option.evidence.status} estimate</small><strong>{total ? formatMoney(total, "en-CH") : "—"}</strong></div>; })}</div>
+    <p className="overview-card-grid__hint">Select a card to show its recommendations and checks.</p>
   </div>;
 }

@@ -21,7 +21,7 @@ export function BudgetLeaf({
     <div className="workspace-leaf">
       <h1>Budget</h1>
       <p className="leaf-intro">
-        Exact synthetic costs for the current selections. No live prices are represented.
+        AI-generated costs for the current selections. Verify live prices before booking.
       </p>
       <div className="budget-columns">
         <section aria-labelledby="category-costs">

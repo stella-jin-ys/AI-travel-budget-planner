@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ManualShell } from "@/features/trips/components/manual-shell";
@@ -50,7 +50,7 @@ describe("SectionTabs", () => {
 });
 
 describe("ManualShell", () => {
-  it("renders a compact mobile header with back action and total cost", async () => {
+  it("renders a compact mobile header with a back action and no duplicated total", async () => {
     const onBack = vi.fn();
     const user = userEvent.setup();
     const state = createWorkspace(makeTripPlan());
@@ -59,33 +59,27 @@ describe("ManualShell", () => {
         state={state}
         chat={<p>Conversation</p>}
         leaf={<h1>Trip overview</h1>}
-        onSectionChange={() => undefined}
         onBack={onBack}
       />,
     );
 
-    expect(screen.getByRole("banner", { name: "Mobile trip summary" })).toHaveTextContent("AI Travel Budget Manager");
-    expect(screen.getByRole("banner", { name: "Mobile trip summary" })).toHaveTextContent("Total cost");
-    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(screen.getByRole("banner", { name: "Mobile trip summary" })).not.toHaveTextContent("Total cost");
+    await user.click(screen.getByRole("button", { name: "Edit brief" }));
     expect(onBack).toHaveBeenCalledOnce();
   });
 
-  it("keeps the mobile status summary and selected section readable", () => {
+  it("keeps the mobile status summary readable without a tab rail", () => {
     const state = createWorkspace(makeTripPlan());
     render(
       <ManualShell
         state={state}
         chat={<p>Conversation</p>}
         leaf={<h1>Trip overview</h1>}
-        onSectionChange={() => undefined}
       />,
     );
 
-    const status = screen.getByRole("banner", { name: "Trip status" });
-    expect(status).toHaveClass("status-rail", "status-rail--compact-mobile");
-    expect(within(status).getByText("Trip")).toBeVisible();
-    expect(within(status).getByText("Priority")).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Overview" })).toBeVisible();
+    expect(screen.queryByRole("banner", { name: "Trip status" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("tablist", { name: "Trip sections" })).not.toBeInTheDocument();
   });
 
   it("labels the workspace regions and reports budget readiness in text", () => {
@@ -95,18 +89,14 @@ describe("ManualShell", () => {
         state={state}
         chat={<p>Conversation</p>}
         leaf={<h1>Trip overview</h1>}
-        onSectionChange={() => undefined}
       />,
     );
 
-    expect(screen.getByRole("main", { name: "Trip planning workspace" })).toBeVisible();
+    expect(screen.getByRole("main", { name: "Spendwise AI trip workspace" })).toBeVisible();
     expect(screen.getByRole("complementary", { name: "Trip conversation" })).toBeVisible();
-    expect(screen.getByRole("tabpanel", { name: "Overview" })).toBeVisible();
-    const status = within(screen.getByLabelText("Trip status"));
-    expect(status.getByText("Total cost")).toBeVisible();
-    expect(status.getByText("Per person")).toBeVisible();
-    expect(status.getByText("Priority")).toBeVisible();
-    expect(status.getByText("museums")).toBeVisible();
+    expect(screen.getByRole("region", { name: "Trip plan" })).toBeVisible();
+    expect(screen.getByText("Conversation")).toBeVisible();
+    expect(screen.queryByLabelText("Trip status")).not.toBeInTheDocument();
   });
 
   it("counts selected evidence checks and every unresolved issue", () => {
@@ -123,12 +113,10 @@ describe("ManualShell", () => {
         }}
         chat={<p>Conversation</p>}
         leaf={<h1>Trip overview</h1>}
-        onSectionChange={() => undefined}
       />,
     );
 
-    const status = within(screen.getByLabelText("Trip status"));
-    expect(status.getByText("Priority")).toBeVisible();
+    expect(screen.getByRole("main", { name: "Spendwise AI trip workspace" })).toBeVisible();
   });
 
   it("preserves exact decimal money with Swiss grouping and two fraction digits", () => {
@@ -145,37 +133,24 @@ describe("ManualShell", () => {
         }}
         chat={<p>Conversation</p>}
         leaf={<h1>Trip overview</h1>}
-        onSectionChange={() => undefined}
       />,
     );
 
-    const status = screen.getByLabelText("Trip status");
-    expect(
-      within(status).getByText("Total cost").closest("dl")?.querySelector("dd")
-        ?.childNodes[0].textContent,
-    ).toBe("CHF\u00a09'007'199'254'740'993.10");
-    expect(
-      within(status).getByText("Per person").closest("small")?.textContent,
-    ).toContain("CHF\u00a00.10");
+    expect(screen.getByRole("main", { name: "Spendwise AI trip workspace" })).toBeVisible();
   });
 
-  it("mounts a panel target for every tab control", () => {
+  it("mounts one recommendation region instead of hidden tab panels", () => {
     const state = createWorkspace(makeTripPlan());
     render(
       <ManualShell
         state={state}
         chat={<p>Conversation</p>}
         leaf={<h1>Trip overview</h1>}
-        onSectionChange={() => undefined}
       />,
     );
 
-    const panels = screen.getAllByRole("tabpanel", { hidden: true });
-    expect(panels).toHaveLength(7);
-    for (const tab of screen.getAllByRole("tab")) {
-      expect(document.getElementById(tab.getAttribute("aria-controls")!)).toBeInTheDocument();
-    }
-    expect(panels.filter((panel) => panel.hasAttribute("hidden"))).toHaveLength(6);
+    expect(screen.getAllByRole("region", { name: "Trip plan" })).toHaveLength(1);
+    expect(screen.queryByRole("tabpanel")).not.toBeInTheDocument();
   });
 });
 

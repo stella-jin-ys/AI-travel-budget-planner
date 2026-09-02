@@ -52,6 +52,11 @@ export interface TripBrief {
   endDate: string;
   travelers: Traveler[];
   interests: string[];
+  currency?: string;
+  budget?: Money;
+  budgetMode?: "total" | "daily";
+  spendingPreference?: "balanced" | "activities" | "stays" | "food";
+  transitTolerance?: "direct" | "flexible" | "overnight";
   purpose?: string;
   accommodationType?: "hotel" | "hostel" | "apartment" | "camping" | "guesthouse";
   strictBudget?: Money;
@@ -66,6 +71,8 @@ export interface PlanAlternative {
   covered: boolean;
   optional: boolean;
   evidence: SourceEvidence;
+  details?: Array<{ label: string; value: string }>;
+  links?: Array<{ label: string; url: string }>;
 }
 
 export interface PlanItem {

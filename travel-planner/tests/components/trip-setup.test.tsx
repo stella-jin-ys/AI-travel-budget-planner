@@ -17,6 +17,8 @@ describe("TripSetup", () => {
   it("starts with empty user-entered values and one accessible date trigger", () => {
     render(<TripSetup onSubmit={() => undefined} />);
 
+    expect(screen.getAllByText("Destination").length).toBeGreaterThan(0);
+    expect(screen.getByText("Step 1 of 2")).toBeVisible();
     expect(screen.getByRole("textbox", { name: "Origin" })).toHaveValue("");
     expect(screen.getByRole("textbox", { name: "Destination" })).toHaveValue("");
     expect(screen.getByRole("textbox", { name: "Budget" })).toHaveValue("");
@@ -28,7 +30,7 @@ describe("TripSetup", () => {
     const user = userEvent.setup();
     render(<TripSetup onSubmit={() => undefined} />);
 
-    expect(screen.getByText("Route & traveller")).toBeVisible();
+    expect(screen.getAllByText("Destination").length).toBeGreaterThan(0);
     expect(screen.getByRole("radio", { name: "Solo" })).toBeChecked();
     expect(screen.queryByRole("spinbutton", { name: "Child 1 age" })).not.toBeInTheDocument();
     expect(screen.getByText("Optimized for your budget")).toBeVisible();
@@ -165,7 +167,7 @@ describe("TripSetup", () => {
     expect(screen.getByRole("radio", { name: "Solo" })).toBeChecked();
     expect(screen.getByRole("radio", { name: "Solo" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Plan my trip" })).toBeDisabled();
-    expect(screen.getByRole("heading", { name: "Add origin and a destination or interests to plan your trip." })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Where are you going?" })).toBeVisible();
 
     await user.type(screen.getByRole("textbox", { name: "Origin" }), "Basel");
     expect(screen.getByRole("button", { name: "Plan my trip" })).toBeDisabled();

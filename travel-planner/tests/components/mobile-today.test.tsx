@@ -17,7 +17,7 @@ describe("MobileToday", () => {
     expect(screen.getByRole("heading", { name: "Next" })).toBeVisible();
     expect(
       screen.getByRole("heading", {
-        name: "Synthetic 10:00 Basel to Interlaken rail connection",
+        name: "Depart Basel SBB 10:00 · arrive Interlaken Ost 12:30",
       }),
     ).toBeVisible();
     expect(screen.getByRole("link", { name: "Directions" })).toHaveAttribute(

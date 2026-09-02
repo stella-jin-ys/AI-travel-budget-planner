@@ -255,8 +255,9 @@ export function TripSetup({
 
         <div className="trip-setup__fields">
           <header className="trip-setup__card-header">
-            <p className="trip-setup__progress">Route & traveller</p>
-            <h2>Add origin and a destination or interests to plan your trip.</h2>
+            <p className="trip-setup__progress"><span>Step 1 of 2</span><span>Destination</span></p>
+            <h2>Where are you going?</h2>
+            <p className="trip-setup__card-copy">Start with where you’re leaving from, then add a destination or tell us what you’re in the mood for.</p>
           </header>
           <label>
                 <span>Origin</span>
