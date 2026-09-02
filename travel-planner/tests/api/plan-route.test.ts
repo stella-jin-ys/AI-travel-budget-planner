@@ -116,6 +116,8 @@ describe("POST /api/plan", () => {
 
   it("grounds one Gemini request and preserves validated details without exposing the raw response", async () => {
     process.env.GEMINI_API_KEY = "gemini-test-key";
+    process.env.SUPABASE_URL = "https://example.supabase.co";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-test-key";
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -161,5 +163,23 @@ describe("POST /api/plan", () => {
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ error: "Trip plan could not be saved. Please try again." });
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not return an AI plan when Supabase persistence is not configured", async () => {
+    process.env.GEMINI_API_KEY = "gemini-test-key";
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        model: "gemini-3.5-flash-lite",
+        steps: [{ type: "model_output", content: [{ type: "text", text: JSON.stringify(groundedPlan()) }] }],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await POST(tripRequest());
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: "Trip plan could not be saved. Please try again." });
   });
 });

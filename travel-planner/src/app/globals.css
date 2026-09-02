@@ -5253,6 +5253,29 @@ body, .setup-shell, .active-leaf { background: #f7f4ea; color: #16233b; }
   }
 }
 
+/* Keep the desktop experience centered while preserving the mobile-first flow. */
+@media (min-width: 48rem) {
+  .launch-screen {
+    padding-inline: max(1.5rem, 4vw);
+  }
+
+  .launch-card {
+    width: min(100%, 35rem);
+    margin-inline: auto !important;
+  }
+
+  .launch-steps {
+    width: min(100%, 54rem);
+    margin-inline: auto;
+  }
+
+  .guided-setup > .app-nav,
+  .guided-card,
+  .workspace-with-nav .manual-shell {
+    margin-inline: auto;
+  }
+}
+
 /* Expanded recommendations keep one continuous cream body beneath an orange header. */
 .workspace-with-nav {
   padding-top: 0 !important;

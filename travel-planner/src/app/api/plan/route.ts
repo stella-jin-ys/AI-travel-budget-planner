@@ -161,7 +161,8 @@ export async function POST(request: Request) {
           : payload.choices?.[0]?.text ?? message?.reasoning;
     if (!content) throw new Error("The AI returned an empty plan.");
     const plan = normalizePlan(parseModelJson(content), brief);
-    await persistTripPlan(brief, plan);
+    const saved = await persistTripPlan(brief, plan);
+    if (!saved) throw new Error("Supabase trip persistence failed");
     return NextResponse.json({ plan, retrievedAt: new Date().toISOString(), providerId: `${provider.id}-${payload.model ?? provider.model}` });
   } catch (error) {
     const message = error instanceof Error && error.message === "Supabase trip persistence failed"
