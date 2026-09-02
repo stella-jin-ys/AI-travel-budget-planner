@@ -7,7 +7,7 @@ export function AIPlanError({ message, onRetry, onEditBrief, navigation }: { mes
       <AppNav {...navigation} context="AI plan" />
       <section className="ai-plan-error__panel" role="alert">
         <h1>{message}</h1>
-        <p>The free planning model could not accept your request right now. Your trip brief is saved.</p>
+        <p>Your trip brief is saved. Retry when the planner is available to continue.</p>
         <div className="ai-plan-error__actions">
           <button type="button" className="ai-plan-error__retry" onClick={onRetry}>Retry travel plan</button>
           <button type="button" className="ai-plan-error__edit" onClick={onEditBrief}>Edit brief</button>

@@ -3497,7 +3497,11 @@ body, .setup-shell, .active-leaf { background: #f7f4ea; color: #16233b; }
   filter: saturate(1.24) brightness(1.2);
 }
 
-.launch-card { align-self: center !important; }
+.launch-card {
+  align-self: center !important;
+  justify-self: center;
+  width: min(100%, 35rem);
+}
 .launch-card h1 em { color: #f7b14c !important; }
 .launch-cta { color: #073f7d !important; background: #f18443 !important; }
 .launch-cta:hover, .launch-cta:focus-visible { background: #ffab6e !important; }

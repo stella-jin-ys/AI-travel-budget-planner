@@ -8,7 +8,24 @@ export class AITripProvider implements TripDataProvider {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(brief),
     });
-    const payload = await response.json() as ProviderTripResult & { error?: string };
+    const contentType = typeof response.headers?.get === "function"
+      ? response.headers.get("content-type") ?? ""
+      : "";
+    if (contentType && !contentType.includes("application/json")) {
+      throw new Error(
+        response.status === 404
+          ? "The AI planner endpoint is unavailable on this deployment."
+          : "The AI planner returned an invalid response. Please try again.",
+      );
+    }
+
+    let payload: ProviderTripResult & { error?: string };
+    try {
+      payload = await response.json() as ProviderTripResult & { error?: string };
+    } catch {
+      throw new Error("The AI planner returned an invalid response. Please try again.");
+    }
+
     if (!response.ok || !payload.plan) throw new Error(payload.error ?? "The AI planner could not create a trip.");
     return payload;
   }
