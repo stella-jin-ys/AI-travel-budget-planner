@@ -6,5 +6,6 @@ The planner combines transport, accommodation, activities, local travel, food, w
 
 ## Live app
 
-[AI Budget Travel Planner](https://stella-jin-ys.github.io/AI-travel-budget-planner/)
+[AI Budget Travel Planner](https://stella-jin-ys.github.io/AI-budget-travel-planner/)
 
+[Vercel deployment](https://ai-budget-travel-planner-stella.vercel.app/)

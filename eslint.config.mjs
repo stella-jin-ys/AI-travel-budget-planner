@@ -13,6 +13,8 @@ const eslintConfig = defineConfig([
     ".open-next/**",
     "build/**",
     "next-env.d.ts",
+    // Ignore generated artifacts left by the pre-root local checkout.
+    "travel-planner/**",
   ]),
 ]);
 

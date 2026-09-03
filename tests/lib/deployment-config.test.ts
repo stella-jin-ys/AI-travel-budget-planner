@@ -13,7 +13,7 @@ describe("deployment config", () => {
   });
 
   it("retains the GitHub Pages static export when explicitly building Pages", () => {
-    expect(getDeploymentConfig(true)).toEqual({ output: "export", basePath: "/AI-travel-budget-planner" });
+    expect(getDeploymentConfig(true)).toEqual({ output: "export", basePath: "/AI-budget-travel-planner" });
   });
 
   it("uses the Webpack build required by the Cloudflare worker adapter", () => {

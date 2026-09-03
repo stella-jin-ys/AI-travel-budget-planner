@@ -3,8 +3,8 @@ import { spendwiseLogoSrc } from "@/features/trips/components/spendwise-logo";
 
 describe("Spendwise logo asset", () => {
   it("keeps the asset under the deployed base path", () => {
-    expect(spendwiseLogoSrc("/AI-travel-budget-planner")).toBe(
-      "/AI-travel-budget-planner/spendwise-butterfly-logo-icon-transparent.png",
+    expect(spendwiseLogoSrc("/AI-budget-travel-planner")).toBe(
+      "/AI-budget-travel-planner/spendwise-butterfly-logo-icon-transparent.png",
     );
   });
 
