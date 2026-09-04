@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { POST } from "@/app/api/plan/route";
+import { maxDuration, POST } from "@/app/api/plan/route";
 
 const supabaseInsert = vi.fn().mockResolvedValue({ error: null });
 vi.mock("@supabase/supabase-js", () => ({
@@ -81,6 +81,10 @@ afterEach(() => {
 });
 
 describe("POST /api/plan", () => {
+  it("allows enough time for a free-model response on Vercel", () => {
+    expect(maxDuration).toBe(300);
+  });
+
   it("makes one Gemini request without falling back to another provider", async () => {
     process.env.GEMINI_API_KEY = "gemini-test-key";
     process.env.OPENROUTER_API_KEY = "openrouter-test-key";
@@ -114,7 +118,8 @@ describe("POST /api/plan", () => {
     expect(await response.json()).toEqual({ error: "AI model is overloaded. Try again later." });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(String(fetchMock.mock.calls[0][0])).toBe("https://openrouter.ai/api/v1/chat/completions");
-    expect(requestBody.model).toBe("openrouter/free");
+    expect(requestBody.model).toBe("openai/gpt-oss-20b:free");
+    expect(requestBody.max_tokens).toBe(4500);
   });
 
   it("uses configured OpenRouter as the single provider when Gemini is also configured", async () => {

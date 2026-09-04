@@ -22,7 +22,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Environment variables
 
 - `GEMINI_API_KEY` enables Gemini planning. `GEMINI_MODEL` is optional.
-- `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` enable OpenRouter's free-model router.
+- `OPENROUTER_API_KEY` enables OpenRouter; `OPENROUTER_MODEL` optionally overrides the default `openai/gpt-oss-20b:free` model.
 - `AI_PROVIDER` selects `gemini` or `openrouter` when both keys are configured.
 - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` enable server-side trip-plan persistence.
 
