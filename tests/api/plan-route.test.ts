@@ -73,6 +73,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   delete process.env.GEMINI_API_KEY;
   delete process.env.OPENROUTER_API_KEY;
+  delete process.env.AI_PROVIDER;
   delete process.env.SUPABASE_URL;
   delete process.env.SUPABASE_SERVICE_ROLE_KEY;
   supabaseInsert.mockReset();
@@ -107,9 +108,28 @@ describe("POST /api/plan", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const response = await POST(tripRequest());
+    const requestBody = JSON.parse(String(fetchMock.mock.calls[0][1]?.body));
 
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ error: "AI model is overloaded. Try again later." });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String(fetchMock.mock.calls[0][0])).toBe("https://openrouter.ai/api/v1/chat/completions");
+    expect(requestBody.model).toBe("openrouter/free");
+  });
+
+  it("uses configured OpenRouter as the single provider when Gemini is also configured", async () => {
+    process.env.AI_PROVIDER = "openrouter";
+    process.env.GEMINI_API_KEY = "gemini-test-key";
+    process.env.OPENROUTER_API_KEY = "openrouter-test-key";
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      json: async () => ({ error: { message: "Provider rate limit reached" } }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await POST(tripRequest());
+
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(String(fetchMock.mock.calls[0][0])).toBe("https://openrouter.ai/api/v1/chat/completions");
   });

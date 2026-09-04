@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { TripBrief, TripPlan } from "@/features/trips/domain/trip";
 import { persistTripPlan } from "@/lib/supabase/persistence";
 
-const openRouterModel = process.env.OPENROUTER_MODEL ?? "minimax/minimax-m3:free";
+const openRouterModel = process.env.OPENROUTER_MODEL ?? "openrouter/free";
 const geminiModel = process.env.GEMINI_MODEL ?? "gemini-3.7-flash";
 const moneySchema = z.object({ amount: z.string().regex(/^\d+(?:\.\d{1,2})?$/), currency: z.string().length(3) });
 const evidenceSchema = z.object({ status: z.enum(["live", "recent", "typical", "stale", "unavailable"]), supplierName: z.string(), checkedAt: z.string(), sourceUrl: z.string().url().optional(), reason: z.string().optional(), synthetic: z.literal(false) });
@@ -122,9 +122,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Please provide a complete trip brief." }, { status: 400 });
   }
 
-  const provider = geminiApiKey
-    ? { id: "gemini" as const, model: geminiModel, apiKey: geminiApiKey }
-    : { id: "openrouter" as const, model: openRouterModel, apiKey: openRouterApiKey! };
+  const preferOpenRouter = process.env.AI_PROVIDER === "openrouter";
+  const provider = openRouterApiKey && (preferOpenRouter || !geminiApiKey)
+    ? { id: "openrouter" as const, model: openRouterModel, apiKey: openRouterApiKey }
+    : { id: "gemini" as const, model: geminiModel, apiKey: geminiApiKey! };
   const isGemini = provider.id === "gemini";
 
   try {
@@ -180,7 +181,12 @@ export async function POST(request: Request) {
       saved = false;
     }
     return NextResponse.json({ plan, retrievedAt: new Date().toISOString(), providerId: `${provider.id}-${payload.model ?? provider.model}`, saved });
-  } catch {
+  } catch (error) {
+    console.error("AI plan generation failed", {
+      provider: provider.id,
+      model: provider.model,
+      message: error instanceof Error ? error.message : "Unknown provider error",
+    });
     return NextResponse.json({ error: "AI model is overloaded. Try again later." }, { status: 503 });
   }
 }

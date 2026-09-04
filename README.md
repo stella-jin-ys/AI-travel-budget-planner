@@ -22,7 +22,8 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Environment variables
 
 - `GEMINI_API_KEY` enables Gemini planning. `GEMINI_MODEL` is optional.
-- `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` provide the fallback provider.
+- `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` enable OpenRouter's free-model router.
+- `AI_PROVIDER` selects `gemini` or `openrouter` when both keys are configured.
 - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` enable server-side trip-plan persistence.
 
 Keep `.env.local` and all real keys out of Git. Add the same variables to the Vercel project environment settings for production.
