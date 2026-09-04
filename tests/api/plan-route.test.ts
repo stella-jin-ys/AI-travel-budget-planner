@@ -122,7 +122,7 @@ describe("POST /api/plan", () => {
       ok: true,
       status: 200,
       json: async () => ({
-        model: "gemini-3.5-flash-lite",
+        model: "gemini-3.7-flash",
         steps: [{ type: "model_output", content: [{ type: "text", text: JSON.stringify(groundedPlan()) }] }],
       }),
     });
@@ -134,6 +134,7 @@ describe("POST /api/plan", () => {
 
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(requestBody.model).toBe("gemini-3.7-flash");
     expect(requestBody.tools).toEqual([{ type: "google_search" }]);
     expect(requestBody.response_format.mime_type).toBe("application/json");
     expect(result.plan.items[0].alternatives[0]).toEqual(expect.objectContaining({
@@ -143,7 +144,7 @@ describe("POST /api/plan", () => {
     expect(result).not.toHaveProperty("raw");
   });
 
-  it("reports a persistence failure after a valid AI response", async () => {
+  it("returns a valid AI plan when configured persistence fails", async () => {
     process.env.GEMINI_API_KEY = "gemini-test-key";
     process.env.SUPABASE_URL = "https://example.supabase.co";
     process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-test-key";
@@ -152,7 +153,7 @@ describe("POST /api/plan", () => {
       ok: true,
       status: 200,
       json: async () => ({
-        model: "gemini-3.5-flash-lite",
+        model: "gemini-3.7-flash",
         steps: [{ type: "model_output", content: [{ type: "text", text: JSON.stringify(groundedPlan()) }] }],
       }),
     });
@@ -160,18 +161,21 @@ describe("POST /api/plan", () => {
 
     const response = await POST(tripRequest());
 
-    expect(response.status).toBe(503);
-    expect(await response.json()).toEqual({ error: "Trip plan could not be saved. Please try again." });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(expect.objectContaining({
+      plan: expect.objectContaining({ title: "Lund to Paris travel plan" }),
+      saved: false,
+    }));
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("does not return an AI plan when Supabase persistence is not configured", async () => {
+  it("returns a valid AI plan when Supabase persistence is not configured", async () => {
     process.env.GEMINI_API_KEY = "gemini-test-key";
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({
-        model: "gemini-3.5-flash-lite",
+        model: "gemini-3.7-flash",
         steps: [{ type: "model_output", content: [{ type: "text", text: JSON.stringify(groundedPlan()) }] }],
       }),
     });
@@ -179,7 +183,27 @@ describe("POST /api/plan", () => {
 
     const response = await POST(tripRequest());
 
-    expect(response.status).toBe(503);
-    expect(await response.json()).toEqual({ error: "Trip plan could not be saved. Please try again." });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(expect.objectContaining({
+      plan: expect.objectContaining({ title: "Lund to Paris travel plan" }),
+      saved: false,
+    }));
+  });
+
+  it("identifies the missing trip fields before calling an AI provider", async () => {
+    process.env.GEMINI_API_KEY = "gemini-test-key";
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const response = await POST(new Request("http://localhost/api/plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    }));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({
+      error: "Please complete the trip brief: origin, start date, end date, and travelers.",
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

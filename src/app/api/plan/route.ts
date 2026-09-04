@@ -4,7 +4,7 @@ import type { TripBrief, TripPlan } from "@/features/trips/domain/trip";
 import { persistTripPlan } from "@/lib/supabase/persistence";
 
 const openRouterModel = process.env.OPENROUTER_MODEL ?? "minimax/minimax-m3:free";
-const geminiModel = process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite";
+const geminiModel = process.env.GEMINI_MODEL ?? "gemini-3.7-flash";
 const moneySchema = z.object({ amount: z.string().regex(/^\d+(?:\.\d{1,2})?$/), currency: z.string().length(3) });
 const evidenceSchema = z.object({ status: z.enum(["live", "recent", "typical", "stale", "unavailable"]), supplierName: z.string(), checkedAt: z.string(), sourceUrl: z.string().url().optional(), reason: z.string().optional(), synthetic: z.literal(false) });
 const detailSchema = z.object({ label: z.string().min(1), value: z.string().min(1) });
@@ -104,8 +104,20 @@ export async function POST(request: Request) {
 
   let brief: TripBrief;
   try {
-    brief = (await request.json()) as TripBrief;
-    if (!brief.origin || !brief.startDate || !brief.endDate || !brief.travelers?.length) throw new Error("Missing required trip inputs.");
+    const candidate = (await request.json()) as Partial<TripBrief>;
+    const missing = [
+      !candidate?.origin?.trim() ? "origin" : undefined,
+      !candidate?.startDate ? "start date" : undefined,
+      !candidate?.endDate ? "end date" : undefined,
+      !candidate?.travelers?.length ? "travelers" : undefined,
+    ].filter((field): field is string => Boolean(field));
+    if (missing.length) {
+      const fields = missing.length === 1
+        ? missing[0]
+        : `${missing.slice(0, -1).join(", ")}, and ${missing.at(-1)}`;
+      return NextResponse.json({ error: `Please complete the trip brief: ${fields}.` }, { status: 400 });
+    }
+    brief = candidate as TripBrief;
   } catch {
     return NextResponse.json({ error: "Please provide a complete trip brief." }, { status: 400 });
   }
@@ -161,13 +173,14 @@ export async function POST(request: Request) {
           : payload.choices?.[0]?.text ?? message?.reasoning;
     if (!content) throw new Error("The AI returned an empty plan.");
     const plan = normalizePlan(parseModelJson(content), brief);
-    const saved = await persistTripPlan(brief, plan);
-    if (!saved) throw new Error("Supabase trip persistence failed");
-    return NextResponse.json({ plan, retrievedAt: new Date().toISOString(), providerId: `${provider.id}-${payload.model ?? provider.model}` });
-  } catch (error) {
-    const message = error instanceof Error && error.message === "Supabase trip persistence failed"
-      ? "Trip plan could not be saved. Please try again."
-      : "AI model is overloaded. Try again later.";
-    return NextResponse.json({ error: message }, { status: 503 });
+    let saved = false;
+    try {
+      saved = await persistTripPlan(brief, plan);
+    } catch {
+      saved = false;
+    }
+    return NextResponse.json({ plan, retrievedAt: new Date().toISOString(), providerId: `${provider.id}-${payload.model ?? provider.model}`, saved });
+  } catch {
+    return NextResponse.json({ error: "AI model is overloaded. Try again later." }, { status: 503 });
   }
 }
