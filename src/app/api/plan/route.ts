@@ -5,7 +5,7 @@ import { persistTripPlan } from "@/lib/supabase/persistence";
 
 export const maxDuration = 300;
 
-const openRouterModel = process.env.OPENROUTER_MODEL ?? "openai/gpt-oss-20b:free";
+const openRouterModel = process.env.OPENROUTER_MODEL ?? "openrouter/free";
 const geminiModel = process.env.GEMINI_MODEL ?? "gemini-3.7-flash";
 const moneySchema = z.object({ amount: z.string().regex(/^\d+(?:\.\d{1,2})?$/), currency: z.string().length(3) });
 const evidenceSchema = z.object({ status: z.enum(["live", "recent", "typical", "stale", "unavailable"]), supplierName: z.string(), checkedAt: z.string(), sourceUrl: z.string().url().optional(), reason: z.string().optional(), synthetic: z.literal(false) });
@@ -151,6 +151,7 @@ export async function POST(request: Request) {
             temperature: 0.2,
             max_tokens: 4500,
             response_format: { type: "json_object" },
+            provider: { require_parameters: true },
             messages: [
               { role: "system", content: "You are a careful travel budget planner. Produce source-linked estimates and never fabricate live booking data." },
               { role: "user", content: promptFor(brief) },

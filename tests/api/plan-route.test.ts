@@ -102,7 +102,7 @@ describe("POST /api/plan", () => {
     expect(String(fetchMock.mock.calls[0][0])).toBe("https://generativelanguage.googleapis.com/v1beta/interactions");
   });
 
-  it("makes one OpenRouter request when Gemini is not configured", async () => {
+  it("makes one capability-filtered OpenRouter free-router request when Gemini is not configured", async () => {
     process.env.OPENROUTER_API_KEY = "openrouter-test-key";
     const fetchMock = vi.fn().mockResolvedValue({
       ok: false,
@@ -118,8 +118,9 @@ describe("POST /api/plan", () => {
     expect(await response.json()).toEqual({ error: "AI model is overloaded. Try again later." });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(String(fetchMock.mock.calls[0][0])).toBe("https://openrouter.ai/api/v1/chat/completions");
-    expect(requestBody.model).toBe("openai/gpt-oss-20b:free");
+    expect(requestBody.model).toBe("openrouter/free");
     expect(requestBody.max_tokens).toBe(4500);
+    expect(requestBody.provider).toEqual({ require_parameters: true });
   });
 
   it("uses configured OpenRouter as the single provider when Gemini is also configured", async () => {
