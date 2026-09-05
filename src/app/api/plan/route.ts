@@ -73,7 +73,27 @@ function normalizePlan(raw: unknown, brief: TripBrief): TripPlan {
 function parseModelJson(content: string) {
   const cleaned = content.replace(/```json?|```/gi, "").trim();
   const start = cleaned.indexOf("{");
-  const end = cleaned.lastIndexOf("}");
+  let end = -1;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let index = start; index >= 0 && index < cleaned.length; index += 1) {
+    const character = cleaned[index];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (character === "\\") escaped = true;
+      else if (character === '"') inString = false;
+      continue;
+    }
+    if (character === '"') inString = true;
+    else if (character === "{") depth += 1;
+    else if (character === "}" && --depth === 0) {
+      end = index;
+      break;
+    }
+  }
+
   if (start < 0 || end <= start) throw new Error("The AI returned an invalid plan format.");
   const candidate = cleaned.slice(start, end + 1);
   try {

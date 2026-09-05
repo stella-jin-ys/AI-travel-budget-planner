@@ -140,6 +140,27 @@ describe("POST /api/plan", () => {
     expect(String(fetchMock.mock.calls[0][0])).toBe("https://openrouter.ai/api/v1/chat/completions");
   });
 
+  it("accepts the first complete plan when OpenRouter adds trailing text", async () => {
+    process.env.OPENROUTER_API_KEY = "openrouter-test-key";
+    const plan = { ...groundedPlan(), title: "Lund to Paris {family} plan" };
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        model: "free-model",
+        choices: [{ message: { content: `${JSON.stringify(plan)}\nCompleted. {"status":"done"}` } }],
+      }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await POST(tripRequest());
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(expect.objectContaining({
+      plan: expect.objectContaining({ title: "Lund to Paris {family} plan" }),
+    }));
+  });
+
   it("grounds one Gemini request and preserves validated details without exposing the raw response", async () => {
     process.env.GEMINI_API_KEY = "gemini-test-key";
     process.env.SUPABASE_URL = "https://example.supabase.co";
